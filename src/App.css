@@ -250,3 +250,10 @@
   gap: 8px;
   margin-top: 12px;
 }
+
+.empty-state-message {
+  margin: 0;
+  color: #475569;
+  font-weight: 700;
+}
+

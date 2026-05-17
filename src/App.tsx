@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import "./App.css"
 import IngredientList from "./components/IngredientList"
 import NumberInputModal from "./components/NumberInputModal"
@@ -53,6 +53,26 @@ function App() {
   const [isTargetServingsModalOpen, setIsTargetServingsModalOpen] = useState(false)
 
   const selectedRecipe = recipes.find((recipe) => recipe.id === selectedRecipeId)
+  const hasRecipes = recipes.length > 0
+
+  useEffect(() => {
+    if (recipes.length === 0) {
+      if (selectedRecipeId !== null) {
+        setSelectedRecipeId(null)
+      }
+      return
+    }
+
+    if (selectedRecipeId === null) {
+      setSelectedRecipeId(recipes[0].id)
+      return
+    }
+
+    const hasSelectedRecipe = recipes.some((recipe) => recipe.id === selectedRecipeId)
+    if (!hasSelectedRecipe) {
+      setSelectedRecipeId(recipes[0].id)
+    }
+  }, [recipes, selectedRecipeId, setSelectedRecipeId])
 
   const baseServingsNumber = selectedRecipe?.baseAmount ?? 0
   const ingredients = selectedRecipe?.ingredients ?? []
@@ -157,43 +177,47 @@ function App() {
 
           <div className="recipe-action-buttons">
             <button type="button" onClick={() => setScreenMode("new")}>レシピ新規作成</button>
-            {selectedRecipeId !== null && (
+            {hasRecipes && selectedRecipe && (
               <button type="button" onClick={() => setScreenMode("edit")}>レシピ編集</button>
             )}
           </div>
 
           <div className="form-grid">
-            <label className="field">
-              <select
-                value={selectedRecipeId ?? ""}
-                onChange={(event) => {
-                  const nextValue = event.target.value
-                  setSelectedRecipeId(nextValue === "" ? null : Number(nextValue))
-                }}
-              >
-                <option value="">レシピ名</option>
-                {recipes.map((recipe) => (
-                  <option key={recipe.id} value={recipe.id}>
-                    {recipe.name}
-                  </option>
-                ))}
-              </select>
-            </label>
+            {hasRecipes ? (
+              <>
+                <label className="field">
+                  <select
+                    value={selectedRecipeId ?? ""}
+                    onChange={(event) => {
+                      setSelectedRecipeId(Number(event.target.value))
+                    }}
+                  >
+                    {recipes.map((recipe) => (
+                      <option key={recipe.id} value={recipe.id}>
+                        {recipe.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
 
-            {selectedRecipe && <p className="recipe-description">{description}</p>}
+                {selectedRecipe && <p className="recipe-description">{description}</p>}
 
-            <p className="base-amount">基準量: {baseServingsNumber || "-"}</p>
+                <p className="base-amount">基準量: {baseServingsNumber || "-"}</p>
 
-            <label className="field">
-              <input
-                type="text"
-                inputMode="none"
-                placeholder="作成量"
-                value={targetServings}
-                readOnly
-                onClick={() => setIsTargetServingsModalOpen(true)}
-              />
-            </label>
+                <label className="field">
+                  <input
+                    type="text"
+                    inputMode="none"
+                    placeholder="作成量"
+                    value={targetServings}
+                    readOnly
+                    onClick={() => setIsTargetServingsModalOpen(true)}
+                  />
+                </label>
+              </>
+            ) : (
+              <p className="empty-state-message">レシピがありません</p>
+            )}
           </div>
 
           <NumberInputModal
@@ -207,13 +231,15 @@ function App() {
             }}
           />
 
-          <div className="ingredients-section">
-            <div className="section-header">
-              <h2>材料</h2>
-            </div>
+          {hasRecipes && (
+            <div className="ingredients-section">
+              <div className="section-header">
+                <h2>材料</h2>
+              </div>
 
-            <IngredientList ingredients={ingredients} scale={scale} />
-          </div>
+              <IngredientList ingredients={ingredients} scale={scale} />
+            </div>
+          )}
         </section>
       )}
 
