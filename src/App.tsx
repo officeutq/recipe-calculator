@@ -20,6 +20,11 @@ function App() {
   const [baseServings, setBaseServings] = useState("4")
   const [targetServings, setTargetServings] = useState("2")
 
+  const baseServingsNumber = Number(baseServings)
+  const targetServingsNumber = Number(targetServings)
+  const canCalculate = baseServingsNumber > 0 && targetServingsNumber > 0
+  const scale = canCalculate ? targetServingsNumber / baseServingsNumber : null
+
   return (
     <main className="app">
       <section className="app-header">
@@ -82,6 +87,10 @@ function App() {
               <dt>作りたい人数</dt>
               <dd>{targetServings || "未入力"}人分</dd>
             </div>
+            <div>
+              <dt>倍率</dt>
+              <dd>{scale === null ? "計算不可" : `${scale}倍`}</dd>
+            </div>
           </dl>
         </div>
 
@@ -92,15 +101,28 @@ function App() {
           </div>
 
           <ul className="ingredient-list">
-            {ingredients.map((ingredient) => (
-              <li className="ingredient-item" key={ingredient.id}>
-                <span className="ingredient-name">{ingredient.name}</span>
-                <span className="ingredient-amount">
-                  {ingredient.amount}
-                  {ingredient.unit}
-                </span>
-              </li>
-            ))}
+            {ingredients.map((ingredient) => {
+              const scaledAmount =
+                scale === null ? null : ingredient.amount * scale
+
+              return (
+                <li className="ingredient-item" key={ingredient.id}>
+                  <span className="ingredient-name">{ingredient.name}</span>
+                  <span className="ingredient-amount">
+                    <span className="original-amount">
+                      {ingredient.amount}
+                      {ingredient.unit}
+                    </span>
+                    <span aria-hidden="true">→</span>
+                    <span>
+                      {scaledAmount === null
+                        ? "-"
+                        : `${scaledAmount}${ingredient.unit}`}
+                    </span>
+                  </span>
+                </li>
+              )
+            })}
           </ul>
         </div>
       </section>
