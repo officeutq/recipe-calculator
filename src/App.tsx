@@ -1,5 +1,7 @@
+import { useState } from "react"
 import "./App.css"
 import IngredientList from "./components/IngredientList"
+import NumberInputModal from "./components/NumberInputModal"
 import RecipeForm, { type RecipeFormValues } from "./components/RecipeForm"
 import { useLocalStorageState } from "./hooks/useLocalStorageState"
 import type { Ingredient, Recipe } from "./types/ingredient"
@@ -48,6 +50,7 @@ function App() {
     "recipe-calculator:screen-mode",
     "calculator",
   )
+  const [isTargetServingsModalOpen, setIsTargetServingsModalOpen] = useState(false)
 
   const selectedRecipe = recipes.find((recipe) => recipe.id === selectedRecipeId)
 
@@ -180,14 +183,26 @@ function App() {
 
             <label className="field">
               <input
-                type="number"
-                min="1"
+                type="text"
+                inputMode="none"
                 placeholder="作成量"
                 value={targetServings}
-                onChange={(event) => setTargetServings(event.target.value)}
+                readOnly
+                onClick={() => setIsTargetServingsModalOpen(true)}
               />
             </label>
           </div>
+
+          <NumberInputModal
+            open={isTargetServingsModalOpen}
+            value={targetServings}
+            allowDecimal={false}
+            onClose={() => setIsTargetServingsModalOpen(false)}
+            onConfirm={(value) => {
+              setTargetServings(value)
+              setIsTargetServingsModalOpen(false)
+            }}
+          />
 
           <div className="ingredients-section">
             <div className="section-header">
