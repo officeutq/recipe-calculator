@@ -100,11 +100,13 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel, onDelete }: Recipe
       <h2 id="recipe-form-screen-title">{title}</h2>
 
       <div className="form-grid">
-        <label className="field">
+        <label className="field field--inline recipe-form-inline-field">
+          <span className="inline-label">レシピ名:</span>
           <input type="text" placeholder="レシピ名" value={name} onChange={(event) => setName(event.target.value)} />
         </label>
 
-        <label className="field">
+        <label className="field field--inline field--inline-top recipe-form-inline-field">
+          <span className="inline-label">説明:</span>
           <textarea
             placeholder="説明"
             value={description}
@@ -113,7 +115,7 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel, onDelete }: Recipe
           />
         </label>
 
-        <label className="field field--inline">
+        <label className="field field--inline recipe-form-inline-field">
           <span className="inline-label">基準分量:</span>
           <input
             className="base-amount-input"
