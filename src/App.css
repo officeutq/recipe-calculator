@@ -81,6 +81,33 @@
   min-height: 112px;
 }
 
+
+.field--inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.base-amount-input {
+  width: 112px;
+}
+
+.ingredient-icon-button {
+  min-width: 40px;
+  min-height: 40px;
+  padding: 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #ffffff;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
 .ingredients-section {
   margin-top: 32px;
   padding-top: 24px;
