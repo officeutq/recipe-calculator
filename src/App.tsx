@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import "./App.css"
 import IngredientList from "./components/IngredientList"
 
@@ -16,16 +16,70 @@ const initialIngredients: Ingredient[] = [
   { id: 4, name: "牛肉", amount: 300, unit: "g" },
 ]
 
+const storageKeys = {
+  recipeName: "recipe-calculator:recipe-name",
+  baseServings: "recipe-calculator:base-servings",
+  targetServings: "recipe-calculator:target-servings",
+  ingredients: "recipe-calculator:ingredients",
+}
+
+const loadString = (key: string, fallback: string) => {
+  const savedValue = localStorage.getItem(key)
+  return savedValue ?? fallback
+}
+
+const loadIngredients = () => {
+  const savedValue = localStorage.getItem(storageKeys.ingredients)
+
+  if (savedValue === null) {
+    return initialIngredients
+  }
+
+  try {
+    const parsedValue = JSON.parse(savedValue)
+
+    if (!Array.isArray(parsedValue)) {
+      return initialIngredients
+    }
+
+    return parsedValue as Ingredient[]
+  } catch {
+    return initialIngredients
+  }
+}
+
 function App() {
-  const [recipeName, setRecipeName] = useState("")
-  const [baseServings, setBaseServings] = useState("4")
-  const [targetServings, setTargetServings] = useState("2")
+  const [recipeName, setRecipeName] = useState(() =>
+    loadString(storageKeys.recipeName, ""),
+  )
+  const [baseServings, setBaseServings] = useState(() =>
+    loadString(storageKeys.baseServings, "4"),
+  )
+  const [targetServings, setTargetServings] = useState(() =>
+    loadString(storageKeys.targetServings, "2"),
+  )
   const [ingredients, setIngredients] =
-    useState<Ingredient[]>(initialIngredients)
+    useState<Ingredient[]>(loadIngredients)
 
   const [newIngredientName, setNewIngredientName] = useState("")
   const [newIngredientAmount, setNewIngredientAmount] = useState("")
   const [newIngredientUnit, setNewIngredientUnit] = useState("")
+
+  useEffect(() => {
+    localStorage.setItem(storageKeys.recipeName, recipeName)
+  }, [recipeName])
+
+  useEffect(() => {
+    localStorage.setItem(storageKeys.baseServings, baseServings)
+  }, [baseServings])
+
+  useEffect(() => {
+    localStorage.setItem(storageKeys.targetServings, targetServings)
+  }, [targetServings])
+
+  useEffect(() => {
+    localStorage.setItem(storageKeys.ingredients, JSON.stringify(ingredients))
+  }, [ingredients])
 
   const baseServingsNumber = Number(baseServings)
   const targetServingsNumber = Number(targetServings)
@@ -57,9 +111,7 @@ function App() {
   }
 
   const handleRemoveIngredient = (id: number) => {
-    setIngredients(
-      ingredients.filter((ingredient) => ingredient.id !== id),
-    )
+    setIngredients(ingredients.filter((ingredient) => ingredient.id !== id))
   }
 
   return (
