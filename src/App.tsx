@@ -190,6 +190,13 @@ function App() {
                   </select>
                 </label>
 
+                <div className="recipe-action-buttons">
+                  <button type="button" onClick={() => setScreenMode("new")}>レシピ新規作成</button>
+                  {selectedRecipe && (
+                    <button type="button" onClick={() => setScreenMode("edit")}>レシピ編集</button>
+                  )}
+                </div>
+
                 <div className="servings-row">
                   <p className="base-amount">基準分量: {baseServingsNumber || "-"}</p>
                   <span className="servings-arrow" aria-hidden="true">→</span>
@@ -208,13 +215,6 @@ function App() {
               </>
             ) : (
               <p className="empty-state-message">レシピがありません</p>
-            )}
-          </div>
-
-          <div className="recipe-action-buttons">
-            <button type="button" onClick={() => setScreenMode("new")}>レシピ新規作成</button>
-            {hasRecipes && selectedRecipe && (
-              <button type="button" onClick={() => setScreenMode("edit")}>レシピ編集</button>
             )}
           </div>
 
