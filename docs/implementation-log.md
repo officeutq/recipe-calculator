@@ -4,6 +4,14 @@
 更新日: 2026-05-17
 ## 更新履歴（2026-05-17）
 
+- iOSリリース前確認として、`capacitor.config.ts` の `appId` / `appName` / `webDir` を再確認した。
+- iOS設定確認として、Bundle Identifier が `jp.co.officeutq.recipecalculator` であることを確認した。
+- iOS設定確認として、表示アプリ名（`CFBundleDisplayName`）が「レシピ計算機」であることを確認した。
+- Version / Build 番号の現在値が `1.0` / `1` であることを確認した。
+- `README.md` に iOSビルド・実機確認・TestFlight前チェック手順を追記した。
+- 既存ロジック・UIは変更していない。
+## 更新履歴（2026-05-17）
+
 - `App.tsx` のヘッダー上部にアプリアイコン画像（`/app-icon.png`）を追加し、`Recipe Calculator` ラベルより上に表示するようにした。
 - `App.css` に `.app-icon` スタイルを追加し、72〜96pxの範囲で小さめ表示・中央寄せにした。
 - 対応目的は、iOS実機表示時にヘッダー周辺の見た目へ余裕とアプリらしさを加えること。
@@ -25,6 +33,7 @@
 
 ## 変更ファイル
 
+- `README.md`
 - `src/components/IngredientFormModal.tsx`
 - `src/components/NumberInputModal.tsx`
 - `src/components/RecipeForm.tsx`
@@ -32,6 +41,11 @@
 
 ## 実装内容
 
+- iOSリリース準備ドキュメント整理
+  - `capacitor.config.ts` の設定値確認結果を README に明記した。
+  - `ios/App/App.xcodeproj/project.pbxproj` の Bundle Identifier / Version / Build 確認結果を README に明記した。
+  - `ios/App/App/Info.plist` の表示アプリ名確認結果を README に明記した。
+  - TestFlightへ進む前の最終チェック項目を README に追加した。
 - `IngredientFormModal`
   - `useEffect` 内の同期 `setState` を廃止した。
   - `open` と `initialIngredient` の変化をレンダー中にガード判定し、必要時のみ初期化する構成へ変更した。
@@ -51,8 +65,16 @@
 
 ## 確認内容
 
+- 設定ファイル確認で、以下の現在値を確認した。
+  - appId: `jp.co.officeutq.recipecalculator`
+  - appName: `レシピ計算機`
+  - webDir: `dist`
+  - Bundle Identifier: `jp.co.officeutq.recipecalculator`
+  - 表示アプリ名: `レシピ計算機`
+  - Version / Build: `1.0` / `1`
 - `npm run lint` が成功することを確認した。
 - `npm run build` が成功することを確認した。
+- `npx cap sync ios` は、この環境の npm レジストリアクセス制限（403）により実行失敗した。
 - コード上で、以下の仕様不変を確認した。
   - NumberInputModal は open 時に `0` 初期化される。
   - 材料モーダルの開閉と保存処理のフローは変更なし。
@@ -60,15 +82,19 @@
 
 ## 次にやること
 
+- Xcode の Signing 設定（Team / Provisioning Profile）をリリース用に最終確認する。
+- TestFlight配布向けに Version / Build の採番ルールを運用に合わせて確定する。
 - 手動操作で、材料追加/編集モーダルと基準分量入力モーダルの体感挙動（開閉・値確定）を回帰確認する。
 
 ## 現在の実装概要
 
 - React + TypeScript + Vite の単一ページアプリ。
+- Capacitor を介して iOS ネイティブプロジェクトへ同期し、実機動作確認まで実施できる状態。
 - 画面モード切替（`calculator` / `new` / `edit`）で操作する構成。
 - レシピ作成・編集は `RecipeForm`、材料入力は `IngredientFormModal`、数値入力は `NumberInputModal` を利用。
 - 永続化は LocalStorage。
 - Capacitor/iOS表示を考慮し、ルートの上下余白は Safe Area を加味する。
+- TestFlight前チェック手順（設定値確認・ビルド・同期・実機確認）を README で運用可能な状態。
 
 ## 現在のデータ構造
 

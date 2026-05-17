@@ -57,6 +57,53 @@ npm run build
 npm run preview
 ```
 
+## iOS ビルド・実機確認・TestFlight前チェック
+
+### 1. Capacitor / iOS 設定値の確認
+
+- `capacitor.config.ts`
+  - `appId`: `jp.co.officeutq.recipecalculator`
+  - `appName`: `レシピ計算機`
+  - `webDir`: `dist`
+- iOS（`ios/App/App.xcodeproj/project.pbxproj`）
+  - Bundle Identifier: `jp.co.officeutq.recipecalculator`
+  - Version（`MARKETING_VERSION`）: `1.0`
+  - Build（`CURRENT_PROJECT_VERSION`）: `1`
+- iOS（`ios/App/App/Info.plist`）
+  - 表示アプリ名（`CFBundleDisplayName`）: `レシピ計算機`
+
+### 2. Webアプリをビルド
+
+```bash
+npm run build
+```
+
+### 3. iOSネイティブ側へ同期
+
+```bash
+npx cap sync ios
+```
+
+### 4. Xcodeで実機確認
+
+1. `npx cap open ios` で Xcode を開く  
+2. Signing & Capabilities で Team / Bundle Identifier を確認  
+3. 実機を選択して Run  
+4. 以下を確認
+   - 画面表示（Safe Area含む）
+   - レシピ作成/編集/削除
+   - 分量換算
+   - 日本語表示
+
+### 5. TestFlightへ進む前の最終チェック
+
+- `npm run lint` が成功する
+- `npm run build` が成功する
+- `npx cap sync ios` が成功する
+- 実機で主要機能の回帰確認が完了している
+- Version / Build番号を今回リリース用に見直している
+- App Store Connect に登録するアプリ情報（名前、説明、スクリーンショット等）の準備方針を決めている
+
 ## 今後の予定
 
 - 手動操作で `new` / `edit` の「材料 0 件保存」時のアラート表示タイミングを再確認
