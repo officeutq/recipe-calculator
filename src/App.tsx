@@ -165,7 +165,7 @@ function App() {
         <p className="app-label">Recipe Calculator</p>
         <h1>レシピ計算機</h1>
         <p className="app-description">
-          基準人数と作りたい人数を入力して、材料の分量を計算します。
+          基準分量と作りたい分量を入力して、材料の分量を計算します。
         </p>
       </section>
 
