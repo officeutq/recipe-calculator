@@ -154,3 +154,31 @@
   margin: 0;
   font-weight: 700;
 }
+
+.ingredient-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ingredient-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.ingredient-name {
+  font-weight: 700;
+}
+
+.ingredient-amount {
+  color: #4f46e5;
+  font-weight: 700;
+}

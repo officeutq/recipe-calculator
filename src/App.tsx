@@ -1,6 +1,20 @@
 import { useState } from "react"
 import "./App.css"
 
+type Ingredient = {
+  id: number
+  name: string
+  amount: number
+  unit: string
+}
+
+const ingredients: Ingredient[] = [
+  { id: 1, name: "じゃがいも", amount: 3, unit: "個" },
+  { id: 2, name: "にんじん", amount: 1, unit: "本" },
+  { id: 3, name: "玉ねぎ", amount: 2, unit: "個" },
+  { id: 4, name: "牛肉", amount: 300, unit: "g" },
+]
+
 function App() {
   const [recipeName, setRecipeName] = useState("")
   const [baseServings, setBaseServings] = useState("4")
@@ -77,9 +91,17 @@ function App() {
             <button type="button">材料を追加</button>
           </div>
 
-          <div className="empty-state">
-            まだ材料がありません。材料を追加して、分量計算を始めましょう。
-          </div>
+          <ul className="ingredient-list">
+            {ingredients.map((ingredient) => (
+              <li className="ingredient-item" key={ingredient.id}>
+                <span className="ingredient-name">{ingredient.name}</span>
+                <span className="ingredient-amount">
+                  {ingredient.amount}
+                  {ingredient.unit}
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
     </main>
