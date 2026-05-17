@@ -170,11 +170,7 @@ function App() {
       </section>
 
       {screenMode === "calculator" && (
-        <section className="recipe-card" aria-labelledby="recipe-form-title">
-          <div className="recipe-card-header">
-            <h2 id="recipe-form-title">レシピ情報</h2>
-          </div>
-
+        <section className="recipe-card recipe-card--calculator">
           <div className="recipe-action-buttons">
             <button type="button" onClick={() => setScreenMode("new")}>レシピ新規作成</button>
             {hasRecipes && selectedRecipe && (
@@ -185,7 +181,8 @@ function App() {
           <div className="form-grid">
             {hasRecipes ? (
               <>
-                <label className="field">
+                <label className="field recipe-select-field">
+                  <span className="inline-label">レシピ:</span>
                   <select
                     value={selectedRecipeId ?? ""}
                     onChange={(event) => {
@@ -200,12 +197,12 @@ function App() {
                   </select>
                 </label>
 
-                {selectedRecipe && <p className="recipe-description">{description}</p>}
-
-                <p className="base-amount">基準量: {baseServingsNumber || "-"}</p>
-
-                <label className="field">
-                  <input
+                <div className="servings-row">
+                  <p className="base-amount">基準分量: {baseServingsNumber || "-"}</p>
+                  <span className="servings-arrow" aria-hidden="true">→</span>
+                  <label className="field servings-target-field">
+                    <span className="inline-label">今回の分量</span>
+                    <input
                     type="text"
                     inputMode="none"
                     placeholder="作成量"
@@ -213,7 +210,8 @@ function App() {
                     readOnly
                     onClick={() => setIsTargetServingsModalOpen(true)}
                   />
-                </label>
+                  </label>
+                </div>
               </>
             ) : (
               <p className="empty-state-message">レシピがありません</p>
@@ -232,13 +230,22 @@ function App() {
           />
 
           {hasRecipes && (
-            <div className="ingredients-section">
-              <div className="section-header">
-                <h2>材料</h2>
+            <>
+              <div className="ingredients-section">
+                <div className="section-header">
+                  <h2>材料</h2>
+                </div>
+
+                <IngredientList ingredients={ingredients} scale={scale} />
               </div>
 
-              <IngredientList ingredients={ingredients} scale={scale} />
-            </div>
+              {selectedRecipe && description !== "" && (
+                <div className="description-section">
+                  <h2>{selectedRecipe.name}レシピの説明</h2>
+                  <p className="recipe-description">{description}</p>
+                </div>
+              )}
+            </>
           )}
         </section>
       )}
