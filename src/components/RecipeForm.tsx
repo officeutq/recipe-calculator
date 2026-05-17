@@ -29,6 +29,7 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel, onDelete }: Recipe
   const [ingredientName, setIngredientName] = useState("")
   const [ingredientAmount, setIngredientAmount] = useState("")
   const [ingredientUnit, setIngredientUnit] = useState("")
+  const [editingIngredientId, setEditingIngredientId] = useState<number | null>(null)
   const [isBaseAmountModalOpen, setIsBaseAmountModalOpen] = useState(false)
   const [isIngredientAmountModalOpen, setIsIngredientAmountModalOpen] = useState(false)
 
@@ -37,7 +38,18 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel, onDelete }: Recipe
     setDescription(initialRecipe?.description ?? "")
     setBaseAmount(initialRecipe ? String(initialRecipe.baseAmount) : "")
     setIngredients(initialRecipe?.ingredients ?? [])
+    setIngredientName("")
+    setIngredientAmount("")
+    setIngredientUnit("")
+    setEditingIngredientId(null)
   }, [initialRecipe])
+
+  const resetIngredientEditor = () => {
+    setIngredientName("")
+    setIngredientAmount("")
+    setIngredientUnit("")
+    setEditingIngredientId(null)
+  }
 
   const handleAddIngredient = () => {
     const trimmedName = ingredientName.trim()
@@ -59,19 +71,50 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel, onDelete }: Recipe
       return
     }
 
-    setIngredients((prevIngredients) => [
-      ...prevIngredients,
-      { id: Date.now(), name: trimmedName, amount, unit: trimmedUnit },
-    ])
-    setIngredientName("")
-    setIngredientAmount("")
-    setIngredientUnit("")
+    if (editingIngredientId === null) {
+      setIngredients((prevIngredients) => [
+        ...prevIngredients,
+        { id: Date.now(), name: trimmedName, amount, unit: trimmedUnit },
+      ])
+      resetIngredientEditor()
+      return
+    }
+
+    setIngredients((prevIngredients) =>
+      prevIngredients.map((ingredient) =>
+        ingredient.id === editingIngredientId
+          ? { ...ingredient, name: trimmedName, amount, unit: trimmedUnit }
+          : ingredient,
+      ),
+    )
+    resetIngredientEditor()
+  }
+
+  const handleEditIngredient = (ingredientId: number) => {
+    const targetIngredient = ingredients.find((ingredient) => ingredient.id === ingredientId)
+
+    if (!targetIngredient) {
+      return
+    }
+
+    setIngredientName(targetIngredient.name)
+    setIngredientAmount(String(targetIngredient.amount))
+    setIngredientUnit(targetIngredient.unit)
+    setEditingIngredientId(targetIngredient.id)
+  }
+
+  const handleCancelIngredientEdit = () => {
+    resetIngredientEditor()
   }
 
   const handleRemoveIngredient = (ingredientId: number) => {
     setIngredients((prevIngredients) =>
       prevIngredients.filter((ingredient) => ingredient.id !== ingredientId),
     )
+
+    if (editingIngredientId === ingredientId) {
+      resetIngredientEditor()
+    }
   }
 
   return (
@@ -144,7 +187,13 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel, onDelete }: Recipe
             />
           </label>
 
-          <button type="button" onClick={handleAddIngredient}>追加</button>
+          <button type="button" onClick={handleAddIngredient}>
+            {editingIngredientId === null ? "追加" : "更新"}
+          </button>
+
+          {editingIngredientId !== null && (
+            <button type="button" onClick={handleCancelIngredientEdit}>キャンセル</button>
+          )}
         </div>
 
         <ul className="ingredient-list ingredient-edit-list">
@@ -154,9 +203,14 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel, onDelete }: Recipe
                 {ingredient.name} {ingredient.amount}
                 {ingredient.unit}
               </span>
-              <button type="button" onClick={() => handleRemoveIngredient(ingredient.id)}>
-                削除
-              </button>
+              <div className="ingredient-actions">
+                <button type="button" onClick={() => handleEditIngredient(ingredient.id)}>
+                  編集
+                </button>
+                <button type="button" onClick={() => handleRemoveIngredient(ingredient.id)}>
+                  削除
+                </button>
+              </div>
             </li>
           ))}
         </ul>
