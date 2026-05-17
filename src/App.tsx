@@ -2,10 +2,8 @@ import "./App.css"
 import IngredientForm from "./components/IngredientForm"
 import IngredientList from "./components/IngredientList"
 import { useLocalStorageState } from "./hooks/useLocalStorageState"
-import type { Ingredient, NewIngredient } from "./types/ingredient"
+import type { Ingredient, NewIngredient, Recipe } from "./types/ingredient"
 
-const initialRecipeName = ""
-const initialBaseServings = "4"
 const initialTargetServings = "2"
 
 const initialIngredients: Ingredient[] = [
@@ -15,35 +13,55 @@ const initialIngredients: Ingredient[] = [
   { id: 4, name: "牛肉", amount: 300, unit: "g" },
 ]
 
+const initialRecipes: Recipe[] = [
+  {
+    id: 1,
+    name: "",
+    description: "",
+    baseAmount: 4,
+    ingredients: initialIngredients,
+  },
+]
+
 const storageKeys = {
-  recipeName: "recipe-calculator:recipe-name",
-  baseServings: "recipe-calculator:base-servings",
+  recipes: "recipe-calculator:recipes",
+  selectedRecipeId: "recipe-calculator:selected-recipe-id",
   targetServings: "recipe-calculator:target-servings",
-  ingredients: "recipe-calculator:ingredients",
 }
 
 function App() {
-  const [recipeName, setRecipeName] = useLocalStorageState(
-    storageKeys.recipeName,
-    initialRecipeName,
+  const [recipes, setRecipes] = useLocalStorageState<Recipe[]>(
+    storageKeys.recipes,
+    initialRecipes,
   )
-  const [baseServings, setBaseServings] = useLocalStorageState(
-    storageKeys.baseServings,
-    initialBaseServings,
+  const [selectedRecipeId, setSelectedRecipeId] = useLocalStorageState<number>(
+    storageKeys.selectedRecipeId,
+    initialRecipes[0].id,
   )
   const [targetServings, setTargetServings] = useLocalStorageState(
     storageKeys.targetServings,
     initialTargetServings,
   )
-  const [ingredients, setIngredients] = useLocalStorageState<Ingredient[]>(
-    storageKeys.ingredients,
-    initialIngredients,
-  )
 
-  const baseServingsNumber = Number(baseServings)
+  const selectedRecipe =
+    recipes.find((recipe) => recipe.id === selectedRecipeId) ?? recipes[0]
+
+  const baseServings = selectedRecipe ? String(selectedRecipe.baseAmount) : ""
+  const recipeName = selectedRecipe?.name ?? ""
+  const ingredients = selectedRecipe?.ingredients ?? []
+
+  const baseServingsNumber = selectedRecipe?.baseAmount ?? 0
   const targetServingsNumber = Number(targetServings)
   const canCalculate = baseServingsNumber > 0 && targetServingsNumber > 0
   const scale = canCalculate ? targetServingsNumber / baseServingsNumber : null
+
+  const updateSelectedRecipe = (updater: (recipe: Recipe) => Recipe) => {
+    setRecipes(
+      recipes.map((recipe) =>
+        recipe.id === selectedRecipeId ? updater(recipe) : recipe,
+      ),
+    )
+  }
 
   const handleAddIngredient = (newIngredient: NewIngredient) => {
     const nextIngredient: Ingredient = {
@@ -51,18 +69,39 @@ function App() {
       ...newIngredient,
     }
 
-    setIngredients([...ingredients, nextIngredient])
+    updateSelectedRecipe((recipe) => ({
+      ...recipe,
+      ingredients: [...recipe.ingredients, nextIngredient],
+    }))
   }
 
   const handleRemoveIngredient = (id: number) => {
-    setIngredients(ingredients.filter((ingredient) => ingredient.id !== id))
+    updateSelectedRecipe((recipe) => ({
+      ...recipe,
+      ingredients: recipe.ingredients.filter((ingredient) => ingredient.id !== id),
+    }))
   }
 
   const handleResetRecipe = () => {
-    setRecipeName(initialRecipeName)
-    setBaseServings(initialBaseServings)
+    setRecipes(initialRecipes)
+    setSelectedRecipeId(initialRecipes[0].id)
     setTargetServings(initialTargetServings)
-    setIngredients(initialIngredients)
+  }
+
+  const handleRecipeNameChange = (name: string) => {
+    updateSelectedRecipe((recipe) => ({
+      ...recipe,
+      name,
+    }))
+  }
+
+  const handleBaseServingsChange = (value: string) => {
+    const parsedValue = Number(value)
+
+    updateSelectedRecipe((recipe) => ({
+      ...recipe,
+      baseAmount: Number.isNaN(parsedValue) ? 0 : parsedValue,
+    }))
   }
 
   return (
@@ -94,7 +133,7 @@ function App() {
               type="text"
               placeholder="例：カレー"
               value={recipeName}
-              onChange={(event) => setRecipeName(event.target.value)}
+              onChange={(event) => handleRecipeNameChange(event.target.value)}
             />
           </label>
 
@@ -105,7 +144,7 @@ function App() {
               min="1"
               placeholder="例：4"
               value={baseServings}
-              onChange={(event) => setBaseServings(event.target.value)}
+              onChange={(event) => handleBaseServingsChange(event.target.value)}
             />
           </label>
 

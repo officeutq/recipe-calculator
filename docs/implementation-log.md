@@ -138,3 +138,41 @@ type NewIngredient = {
 
 - 本ドキュメント内の「事実」は 2026-05-17 時点の実装コードに基づく。
 - 「今後の方針案」は既存ドキュメントの方針や現実装からの推測であり、未実装。
+
+---
+
+## 更新履歴（2026-05-17）
+
+### 変更ファイル（事実）
+
+- `src/types/ingredient.ts`
+- `src/App.tsx`
+- `docs/implementation-log.md`
+
+### 実装内容（事実）
+
+- `Recipe` 型を追加した。`id`, `name`, `description`, `baseAmount`, `ingredients` を持つ構造にした。
+- `Ingredient` 型は維持した。
+- 初期データを `Ingredient[]` 中心から `Recipe[]`（`initialRecipes`）へ変更した。
+- `localStorage` の保存対象を `recipeName` / `baseServings` / `ingredients` 個別保存から、`recipes` 保存へ変更した。
+- `selectedRecipeId` を state として追加し、`localStorage` に保存するようにした。
+- 換算計算は、選択中レシピ（`selectedRecipeId` で特定）から `baseAmount` と `ingredients` を参照する構成に変更した。
+- 既存 UI の見た目は大きく変更せず、従来の入力・換算・材料追加削除フローを維持した。
+
+### 学習ポイント（事実）
+
+- 複数レシピ対応の初期段階では、UI を増やす前に state 正規化（`Recipe[]` + `selectedRecipeId`）を先行させると差分を小さく保てる。
+- 既存の単一 state を Recipe 内部へ寄せる際は、更新関数（今回の `updateSelectedRecipe`）を挟むと変更箇所を局所化できる。
+- 段階的移行時は、入力 UI はそのままでもデータ参照先を切り替えるだけで換算機能を維持しやすい。
+
+### 確認内容（事実）
+
+- `npm run build` が成功することを確認した。
+- TypeScript ビルド上で、`Recipe[]` 中心の state 変更後もコンパイルエラーがないことを確認した。
+
+### 次にやること（今後の方針案）
+
+- レシピ一覧 UI を追加し、`selectedRecipeId` をユーザー操作で切り替え可能にする。
+- レシピ新規作成・編集画面を段階的に追加する（今回未実装）。
+- `targetServings` も将来的にはレシピ単位保存か画面単位保存か方針を決めて整理する。
+- 小数表示ルール（桁数・丸め）を明確化して換算表示を改善する。
