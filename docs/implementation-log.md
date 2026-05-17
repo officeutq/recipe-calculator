@@ -13,36 +13,33 @@
 
 ### 実装内容（事実）
 
-- `new/edit` 画面の `RecipeForm` 上部入力欄を、ラベル + 入力欄の1行レイアウトに統一した。
-- レシピ名行を `レシピ名:` + テキスト入力の inline 構成へ変更し、既存の `name` state 更新と保存処理フローを維持した。
-- 説明行を `説明:` + `textarea` の inline 構成へ変更し、複数行入力・改行可能な挙動と既存の `description` state / 保存処理を維持した。
-- 基準分量行は `基準分量:` + 入力欄の1行表示を維持しつつ、レシピ名行と同系統の inline クラス構成にそろえた。
-- `NumberInputModal` 連携（読み取り専用 input 押下でモーダル表示、確定値反映）は変更していない。
-- `App.css` に `RecipeForm` 用の inline 補助スタイルを追加し、説明行のみラベルを上寄せできるようにした。
-- 追加スタイルは `recipe-form-inline-field` 経由で適用し、`calculator` 画面の既存レイアウトへ影響しないようにした。
+- `new/edit` 画面の `RecipeForm` に、単一行表示専用クラス `recipe-form-inline-field--single` を追加した。
+- レシピ名行と基準分量行に `recipe-form-inline-field--single` を適用し、`flex-wrap: nowrap` でラベルと入力欄が同一行に収まるようにした。
+- 単一行フィールドのラベルに `flex: 0 0 auto` と `white-space: nowrap` を適用し、ラベル折り返しを防止した。
+- 入力欄側に `flex: 1 1 auto` と `min-width: 0` を適用し、狭い幅でも入力欄が行内で縮小できるようにした。
+- 説明行は既存方針のまま維持し、ラベル上寄せと `textarea` 複数行入力を継続した。
+- `RecipeForm` 以外（保存処理・state 構造・`NumberInputModal`・`IngredientFormModal`・calculator 画面・LocalStorage・材料一覧）には変更を加えていない。
 
 ### 学習ポイント（事実）
 
-- 共通クラス（`field--inline`）をベースに、画面限定クラスを重ねると、再利用性を保ちながら影響範囲を安全に限定できる。
-- `textarea` を含む行は `align-items: flex-start` を局所適用することで、ラベルを自然に上端揃えできる。
+- スマホ幅で 1 行維持したいフィールドは、`nowrap` と「ラベル固定 + 入力可変」の組み合わせが有効。
+- `flex` 子要素に `min-width: 0` を与えると、入力欄の不要なはみ出しや改行落ちを抑制できる。
 
 ### 確認内容（事実）
 
-- `npm run build` を実行し、TypeScript コンパイルおよび Vite ビルド成功を確認した。
-- 変更対象が `RecipeForm` とそのスタイルに限定され、`IngredientFormModal` / `NumberInputModal` / LocalStorage 処理に差分がないことを確認した。
-- `calculator` 画面専用クラス（例: `.recipe-select-field`, `.servings-row`）には差分がないことを確認した。
+- `npm run build` を実行し、ビルドが成功することを確認した。
+- 差分が `RecipeForm` のレイアウト関連に限定され、対象外機能に変更がないことを確認した。
 
 ### 次にやること（推測）
 
-- 実機幅（特に 320px〜390px）で、レシピ名行・説明行の折り返し時視認性を目視確認する。
-- 必要であればラベル幅や入力最小幅を微調整し、長文ラベル追加時にも崩れにくい設計に拡張する。
+- 実機幅（320px〜390px）で new/edit 画面を目視確認し、フォントサイズや文言変更時でも 1 行表示が維持されるか確認する。
 
 ## 現在の実装概要（事実）
 
 - React + TypeScript + Vite の単一ページ構成。
-- 画面モード切替で `calculator` / `new` / `edit` を表示。
-- `new/edit` の `RecipeForm` は、上部入力欄（レシピ名・説明・基準分量）をラベル + 入力の inline ベースで表示し、材料編集セクションと保存操作を提供する。
-- 数値入力は `NumberInputModal`、材料追加/編集は `IngredientFormModal` を利用する。
+- `calculator` / `new` / `edit` を画面モード切替で表示。
+- `RecipeForm` の上部入力欄は、レシピ名・基準分量を 1 行の inline 入力、説明を複数行 `textarea` として表示。
+- 数値入力は `NumberInputModal`、材料追加/編集は `IngredientFormModal` を使用。
 
 ## 現在のデータ構造（事実）
 
@@ -71,11 +68,11 @@
   - 材料一覧（換算結果）
   - 説明表示
 - `new` / `edit` 画面（`RecipeForm`）
-  - レシピ名行（`レシピ名:` + 入力欄）
-  - 説明行（`説明:` + `textarea`）
-  - 基準分量行（`基準分量:` + 入力欄、`NumberInputModal` 起点）
+  - レシピ名行（1 行: `レシピ名:` + 入力欄）
+  - 説明行（`説明:` + `textarea`、複数行）
+  - 基準分量行（1 行: `基準分量:` + 入力欄、`NumberInputModal` 起点）
   - 材料見出し行（`材料` + `材料追加`）
-  - 材料一覧（編集/削除アイコン）
+  - 材料一覧（編集/削除）
   - 保存/キャンセル（編集時は削除も表示）
 - モーダル
   - `IngredientFormModal`
