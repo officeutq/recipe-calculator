@@ -1,9 +1,16 @@
 import { useEffect, useState } from "react"
 import "./App.css"
+import IngredientForm from "./components/IngredientForm"
 import IngredientList from "./components/IngredientList"
 
 type Ingredient = {
   id: number
+  name: string
+  amount: number
+  unit: string
+}
+
+type NewIngredient = {
   name: string
   amount: number
   unit: string
@@ -61,10 +68,6 @@ function App() {
   const [ingredients, setIngredients] =
     useState<Ingredient[]>(loadIngredients)
 
-  const [newIngredientName, setNewIngredientName] = useState("")
-  const [newIngredientAmount, setNewIngredientAmount] = useState("")
-  const [newIngredientUnit, setNewIngredientUnit] = useState("")
-
   useEffect(() => {
     localStorage.setItem(storageKeys.recipeName, recipeName)
   }, [recipeName])
@@ -86,28 +89,13 @@ function App() {
   const canCalculate = baseServingsNumber > 0 && targetServingsNumber > 0
   const scale = canCalculate ? targetServingsNumber / baseServingsNumber : null
 
-  const handleAddIngredient = () => {
-    const amountNumber = Number(newIngredientAmount)
-
-    if (
-      newIngredientName.trim() === "" ||
-      newIngredientUnit.trim() === "" ||
-      amountNumber <= 0
-    ) {
-      return
-    }
-
+  const handleAddIngredient = (newIngredient: NewIngredient) => {
     const nextIngredient: Ingredient = {
       id: Date.now(),
-      name: newIngredientName.trim(),
-      amount: amountNumber,
-      unit: newIngredientUnit.trim(),
+      ...newIngredient,
     }
 
     setIngredients([...ingredients, nextIngredient])
-    setNewIngredientName("")
-    setNewIngredientAmount("")
-    setNewIngredientUnit("")
   }
 
   const handleRemoveIngredient = (id: number) => {
@@ -188,43 +176,7 @@ function App() {
             <h2>材料</h2>
           </div>
 
-          <div className="ingredient-form">
-            <label className="field">
-              <span>材料名</span>
-              <input
-                type="text"
-                placeholder="例：卵"
-                value={newIngredientName}
-                onChange={(event) => setNewIngredientName(event.target.value)}
-              />
-            </label>
-
-            <label className="field">
-              <span>分量</span>
-              <input
-                type="number"
-                min="0"
-                step="0.1"
-                placeholder="例：2"
-                value={newIngredientAmount}
-                onChange={(event) => setNewIngredientAmount(event.target.value)}
-              />
-            </label>
-
-            <label className="field">
-              <span>単位</span>
-              <input
-                type="text"
-                placeholder="例：個"
-                value={newIngredientUnit}
-                onChange={(event) => setNewIngredientUnit(event.target.value)}
-              />
-            </label>
-
-            <button type="button" onClick={handleAddIngredient}>
-              材料を追加
-            </button>
-          </div>
+          <IngredientForm onAddIngredient={handleAddIngredient} />
 
           <IngredientList
             ingredients={ingredients}
