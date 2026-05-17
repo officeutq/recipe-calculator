@@ -95,6 +95,11 @@ function App() {
       return null
     }
 
+    if (values.ingredients.length < 1) {
+      alert("材料を1件以上追加してください")
+      return null
+    }
+
     return baseAmount
   }
 
