@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import NumberInputModal from "./NumberInputModal"
+import IngredientFormModal from "./IngredientFormModal"
 import type { Ingredient, Recipe } from "../types/ingredient"
 
 export type RecipeFormValues = {
@@ -32,6 +33,7 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel, onDelete }: Recipe
   const [editingIngredientId, setEditingIngredientId] = useState<number | null>(null)
   const [isBaseAmountModalOpen, setIsBaseAmountModalOpen] = useState(false)
   const [isIngredientAmountModalOpen, setIsIngredientAmountModalOpen] = useState(false)
+  const [isIngredientFormModalOpen, setIsIngredientFormModalOpen] = useState(false)
 
   useEffect(() => {
     setName(initialRecipe?.name ?? "")
@@ -51,7 +53,19 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel, onDelete }: Recipe
     setEditingIngredientId(null)
   }
 
-  const handleAddIngredient = () => {
+  const handleAddIngredient = (ingredient: { name: string; amount: number; unit: string }) => {
+    setIngredients((prevIngredients) => [
+      ...prevIngredients,
+      { id: Date.now(), ...ingredient },
+    ])
+    setIsIngredientFormModalOpen(false)
+  }
+
+  const handleUpdateIngredient = () => {
+    if (editingIngredientId === null) {
+      return
+    }
+
     const trimmedName = ingredientName.trim()
     const amount = Number(ingredientAmount)
     const trimmedUnit = ingredientUnit.trim()
@@ -71,15 +85,6 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel, onDelete }: Recipe
       return
     }
 
-    if (editingIngredientId === null) {
-      setIngredients((prevIngredients) => [
-        ...prevIngredients,
-        { id: Date.now(), name: trimmedName, amount, unit: trimmedUnit },
-      ])
-      resetIngredientEditor()
-      return
-    }
-
     setIngredients((prevIngredients) =>
       prevIngredients.map((ingredient) =>
         ingredient.id === editingIngredientId
@@ -87,6 +92,7 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel, onDelete }: Recipe
           : ingredient,
       ),
     )
+
     resetIngredientEditor()
   }
 
@@ -101,10 +107,6 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel, onDelete }: Recipe
     setIngredientAmount(String(targetIngredient.amount))
     setIngredientUnit(targetIngredient.unit)
     setEditingIngredientId(targetIngredient.id)
-  }
-
-  const handleCancelIngredientEdit = () => {
-    resetIngredientEditor()
   }
 
   const handleRemoveIngredient = (ingredientId: number) => {
@@ -123,32 +125,15 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel, onDelete }: Recipe
 
       <div className="form-grid">
         <label className="field">
-          <input
-            type="text"
-            placeholder="レシピ名"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-          />
+          <input type="text" placeholder="レシピ名" value={name} onChange={(event) => setName(event.target.value)} />
         </label>
 
         <label className="field">
-          <input
-            type="text"
-            placeholder="説明"
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-          />
+          <input type="text" placeholder="説明" value={description} onChange={(event) => setDescription(event.target.value)} />
         </label>
 
         <label className="field">
-          <input
-            type="text"
-            inputMode="none"
-            placeholder="基準量"
-            value={baseAmount}
-            readOnly
-            onClick={() => setIsBaseAmountModalOpen(true)}
-          />
+          <input type="text" inputMode="none" placeholder="基準量" value={baseAmount} readOnly onClick={() => setIsBaseAmountModalOpen(true)} />
         </label>
       </div>
 
@@ -157,44 +142,28 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel, onDelete }: Recipe
           <h2>材料</h2>
         </div>
 
-        <div className="form-grid ingredient-editor-grid">
-          <label className="field">
-            <input
-              type="text"
-              placeholder="材料名"
-              value={ingredientName}
-              onChange={(event) => setIngredientName(event.target.value)}
-            />
-          </label>
+        <button type="button" onClick={() => setIsIngredientFormModalOpen(true)}>
+          材料追加
+        </button>
 
-          <label className="field">
-            <input
-              type="text"
-              inputMode="none"
-              placeholder="分量"
-              value={ingredientAmount}
-              readOnly
-              onClick={() => setIsIngredientAmountModalOpen(true)}
-            />
-          </label>
+        {editingIngredientId !== null && (
+          <div className="form-grid ingredient-editor-grid">
+            <label className="field">
+              <input type="text" placeholder="材料名" value={ingredientName} onChange={(event) => setIngredientName(event.target.value)} />
+            </label>
 
-          <label className="field">
-            <input
-              type="text"
-              placeholder="単位"
-              value={ingredientUnit}
-              onChange={(event) => setIngredientUnit(event.target.value)}
-            />
-          </label>
+            <label className="field">
+              <input type="text" inputMode="none" placeholder="分量" value={ingredientAmount} readOnly onClick={() => setIsIngredientAmountModalOpen(true)} />
+            </label>
 
-          <button type="button" onClick={handleAddIngredient}>
-            {editingIngredientId === null ? "追加" : "更新"}
-          </button>
+            <label className="field">
+              <input type="text" placeholder="単位" value={ingredientUnit} onChange={(event) => setIngredientUnit(event.target.value)} />
+            </label>
 
-          {editingIngredientId !== null && (
-            <button type="button" onClick={handleCancelIngredientEdit}>キャンセル</button>
-          )}
-        </div>
+            <button type="button" onClick={handleUpdateIngredient}>更新</button>
+            <button type="button" onClick={resetIngredientEditor}>キャンセル</button>
+          </div>
+        )}
 
         <ul className="ingredient-list ingredient-edit-list">
           {ingredients.map((ingredient) => (
@@ -204,18 +173,15 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel, onDelete }: Recipe
                 {ingredient.unit}
               </span>
               <div className="ingredient-actions">
-                <button type="button" onClick={() => handleEditIngredient(ingredient.id)}>
-                  編集
-                </button>
-                <button type="button" onClick={() => handleRemoveIngredient(ingredient.id)}>
-                  削除
-                </button>
+                <button type="button" onClick={() => handleEditIngredient(ingredient.id)}>編集</button>
+                <button type="button" onClick={() => handleRemoveIngredient(ingredient.id)}>削除</button>
               </div>
             </li>
           ))}
         </ul>
       </div>
 
+      <IngredientFormModal open={isIngredientFormModalOpen} title="材料追加" onClose={() => setIsIngredientFormModalOpen(false)} onSave={handleAddIngredient} />
 
       <NumberInputModal
         open={isIngredientAmountModalOpen}
@@ -240,16 +206,9 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel, onDelete }: Recipe
       />
 
       <div className="recipe-action-buttons form-actions">
-        <button
-          type="button"
-          onClick={() => onSave({ name, description, baseAmount, ingredients })}
-        >
-          保存
-        </button>
+        <button type="button" onClick={() => onSave({ name, description, baseAmount, ingredients })}>保存</button>
         <button type="button" onClick={onCancel}>キャンセル</button>
-        {onDelete && (
-          <button type="button" onClick={onDelete}>削除</button>
-        )}
+        {onDelete && <button type="button" onClick={onDelete}>削除</button>}
       </div>
     </section>
   )
