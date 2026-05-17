@@ -1,13 +1,32 @@
+import { useEffect, useState } from "react"
 import type { Recipe } from "../types/ingredient"
+
+type RecipeFormValues = {
+  name: string
+  description: string
+  baseAmount: string
+}
 
 type RecipeFormProps = {
   title: string
   initialRecipe?: Recipe
-  onSave: () => void
+  onSave: (values: RecipeFormValues) => void
   onCancel: () => void
 }
 
 function RecipeForm({ title, initialRecipe, onSave, onCancel }: RecipeFormProps) {
+  const [name, setName] = useState(initialRecipe?.name ?? "")
+  const [description, setDescription] = useState(initialRecipe?.description ?? "")
+  const [baseAmount, setBaseAmount] = useState(
+    initialRecipe ? String(initialRecipe.baseAmount) : "",
+  )
+
+  useEffect(() => {
+    setName(initialRecipe?.name ?? "")
+    setDescription(initialRecipe?.description ?? "")
+    setBaseAmount(initialRecipe ? String(initialRecipe.baseAmount) : "")
+  }, [initialRecipe])
+
   return (
     <section className="recipe-card" aria-labelledby="recipe-form-screen-title">
       <h2 id="recipe-form-screen-title">{title}</h2>
@@ -17,7 +36,8 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel }: RecipeFormProps)
           <input
             type="text"
             placeholder="レシピ名"
-            defaultValue={initialRecipe?.name ?? ""}
+            value={name}
+            onChange={(event) => setName(event.target.value)}
           />
         </label>
 
@@ -25,7 +45,8 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel }: RecipeFormProps)
           <input
             type="text"
             placeholder="説明"
-            defaultValue={initialRecipe?.description ?? ""}
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
           />
         </label>
 
@@ -34,13 +55,19 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel }: RecipeFormProps)
             type="number"
             min="1"
             placeholder="基準量"
-            defaultValue={initialRecipe?.baseAmount ?? ""}
+            value={baseAmount}
+            onChange={(event) => setBaseAmount(event.target.value)}
           />
         </label>
       </div>
 
       <div className="recipe-action-buttons form-actions">
-        <button type="button" onClick={onSave}>保存</button>
+        <button
+          type="button"
+          onClick={() => onSave({ name, description, baseAmount })}
+        >
+          保存
+        </button>
         <button type="button" onClick={onCancel}>キャンセル</button>
       </div>
     </section>
