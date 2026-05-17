@@ -4,9 +4,10 @@
 
 ## 現在の実装概要（事実）
 
-- React + TypeScript + Vite の単一画面アプリとして、レシピ選択と作成量入力による材料換算表示を行う。
-- 計算画面は「選択専用 + 表示専用」を優先し、材料編集操作は持たない。
-- `recipes` / `selectedRecipeId` / `targetServings` を `localStorage` と同期し、再読み込み後に復元する。
+- React + TypeScript + Vite の単一画面アプリとして、画面モード（`calculator` / `new` / `edit`）で表示を切り替える構成にした。
+- 計算画面はレシピ選択と作成量入力による材料換算表示を担当し、既存の計算 UI を維持している。
+- 新規作成画面・編集画面は `RecipeForm` を共通利用する土台を追加し、保存は仮実装（`console.log`）にしている。
+- `recipes` / `selectedRecipeId` / `targetServings` / `screenMode` を `localStorage` と同期し、再読み込み後に復元する。
 
 ## 現在のデータ構造（事実）
 
@@ -31,6 +32,8 @@ type Recipe = {
   baseAmount: number
   ingredients: Ingredient[]
 }
+
+type ScreenMode = "calculator" | "new" | "edit"
 ```
 
 主要 state:
@@ -38,54 +41,69 @@ type Recipe = {
 - `recipes: Recipe[]`
 - `selectedRecipeId: number | null`
 - `targetServings: string`
+- `screenMode: ScreenMode`
 
 導出値:
 
 - `selectedRecipe`
 - `baseServingsNumber`
 - `ingredients`
+- `description`
 - `scale`
 
 ## 現在の画面構成（事実）
 
 - ヘッダー
   - アプリ名、説明文
-- レシピ情報カード
-  - リセットボタン
-  - レシピ新規作成ボタン（仮実装: `console.log("new")`）
-  - レシピ編集ボタン（`selectedRecipeId` がある時のみ表示、仮実装: `console.log("edit")`）
-  - レシピ選択ドロップダウン（先頭プレースホルダ: 「レシピ名」）
-  - 選択レシピ説明（未選択時は非表示）
-  - 基準量の表示専用テキスト
-  - 作成量入力（placeholder: 「作成量」）
-- 材料セクション
-  - 換算表示専用の材料一覧（元分量 → 換算後分量）
+- calculator 画面
+  - レシピ情報カード
+    - リセットボタン
+    - レシピ新規作成ボタン（押下で `screenMode = "new"`）
+    - レシピ編集ボタン（選択時のみ表示、押下で `screenMode = "edit"`）
+    - レシピ選択ドロップダウン
+    - 選択レシピ説明
+    - 基準量表示
+    - 作成量入力
+  - 材料セクション
+    - 換算表示専用の材料一覧
+- new 画面
+  - `RecipeForm`
+    - タイトル「レシピ新規作成」
+    - レシピ名
+    - 説明
+    - 基準量
+    - 保存（仮実装: `console.log("save new")`）
+    - キャンセル（`screenMode = "calculator"`）
+- edit 画面
+  - `RecipeForm`（再利用）
+    - タイトル「レシピ編集」
+    - `selectedRecipe` の初期値表示
+    - 保存（仮実装: `console.log("save edit")`）
+    - キャンセル（`screenMode = "calculator"`）
 
 ## 更新履歴（2026-05-17）
 
 ### 変更ファイル（事実）
 
 - `src/App.tsx`
-- `src/components/IngredientList.tsx`
+- `src/components/RecipeForm.tsx`
 - `src/App.css`
 - `docs/implementation-log.md`
 
 ### 実装内容（事実）
 
-- レシピ名テキスト入力を削除し、`recipes` を選択肢に使うドロップダウンへ変更した。
-- ドロップダウン先頭にプレースホルダ「レシピ名」を追加し、変更時に `selectedRecipeId` を更新するようにした。
-- 選択中レシピの `description` を表示し、未選択時は非表示にした。
-- 基準量入力を削除し、「基準量: {baseAmount}」の表示専用にした。
-- 作成量入力のラベルを削除し、placeholder を「作成量」に変更した。
-- 入力内容カード（`preview-section`）を削除した。
-- `IngredientForm` を非表示化（画面から除去）し、材料欄を換算表示専用にした。
-- `IngredientList` から削除ボタンを除去し、表示専用コンポーネントへ変更した。
-- 「レシピ新規作成」「レシピ編集」ボタンを追加し、仮実装として `console.log` を設定した。
+- `ScreenMode` 型（`calculator` / `new` / `edit`）を追加した。
+- `screenMode` state を追加し、初期値を `"calculator"` に設定した。
+- 「レシピ新規作成」「レシピ編集」ボタンを `console.log` から `setScreenMode` へ変更した。
+- `calculator` 画面に既存 UI（レシピ選択・説明・基準量・作成量・材料換算表示）を維持したまま条件レンダリングを導入した。
+- 新規コンポーネント `RecipeForm` を追加し、new/edit 画面で共通利用する土台を作成した。
+- new 画面で保存・キャンセル動作を接続した（保存は仮実装）。
+- edit 画面で `selectedRecipe` の初期値表示、保存・キャンセル動作を接続した（保存は仮実装）。
 
 ### 学習ポイント（事実）
 
-- 計算画面を表示専用へ寄せるときは、既存の換算ロジック（`scale` 計算）を残しつつ入力・編集 UI の責務だけを段階的に外すと安全に移行できる。
-- `selectedRecipeId` を `null` 許容にすると、未選択状態をドロップダウンのプレースホルダで自然に表現できる。
+- URL 分割前の段階では、画面モード state と条件レンダリングで遷移設計を進めると、既存画面を壊さず段階的に拡張しやすい。
+- new/edit の UI を先に共通コンポーネント化しておくと、将来のバリデーションや保存処理追加時の差分を小さくできる。
 
 ### 確認内容（事実）
 
@@ -93,6 +111,6 @@ type Recipe = {
 
 ### 次にやること（推測）
 
-- レシピ新規作成画面を追加し、ボタンの遷移先を接続する。
-- レシピ編集画面を追加し、材料編集機能を計算画面外へ分離する。
-- 数値入力改善（モーダル化）と表示桁数ルールを導入する。
+- `RecipeForm` の入力値を state 化し、new/edit それぞれで保存処理（LocalStorage 更新）を実装する。
+- 材料編集（追加・削除・単位）を `RecipeForm` 内へ段階的に導入する。
+- 数値入力モーダル（`NumberInputModal`）を追加し、数値入力 UX を統一する。
