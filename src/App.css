@@ -121,6 +121,12 @@
   font-weight: 700;
 }
 
+
+.ingredient-actions {
+  display: flex;
+  gap: 8px;
+}
+
 .ingredient-amount {
   display: flex;
   align-items: center;
