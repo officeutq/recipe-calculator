@@ -8,38 +8,40 @@
 ### 変更ファイル（事実）
 
 - `src/components/RecipeForm.tsx`
+- `src/App.css`
 - `docs/implementation-log.md`
 
 ### 実装内容（事実）
 
-- `new/edit` 画面の `RecipeForm` における材料削除処理で、削除アイコン押下時に `window.confirm("この材料を削除しますか？")` を表示するようにした。
-- confirm が `OK` の場合のみ対象材料を配列から削除するようにした。
-- confirm が `キャンセル` の場合は早期 return し、材料配列・モーダル状態・`editingIngredientId` を含む状態を一切変更しないようにした。
-- 既存仕様を維持し、confirm が `OK` かつ削除対象が `editingIngredientId` と一致する場合のみ `handleCloseIngredientModal()` を呼び、モーダルを閉じて `editingIngredientId` を `null` に戻す挙動を継続した。
-- `calculator` 画面、`IngredientFormModal`、`NumberInputModal`、保存処理、LocalStorage 処理は変更していない。
+- `new/edit` 画面の `RecipeForm` 上部入力欄を、ラベル + 入力欄の1行レイアウトに統一した。
+- レシピ名行を `レシピ名:` + テキスト入力の inline 構成へ変更し、既存の `name` state 更新と保存処理フローを維持した。
+- 説明行を `説明:` + `textarea` の inline 構成へ変更し、複数行入力・改行可能な挙動と既存の `description` state / 保存処理を維持した。
+- 基準分量行は `基準分量:` + 入力欄の1行表示を維持しつつ、レシピ名行と同系統の inline クラス構成にそろえた。
+- `NumberInputModal` 連携（読み取り専用 input 押下でモーダル表示、確定値反映）は変更していない。
+- `App.css` に `RecipeForm` 用の inline 補助スタイルを追加し、説明行のみラベルを上寄せできるようにした。
+- 追加スタイルは `recipe-form-inline-field` 経由で適用し、`calculator` 画面の既存レイアウトへ影響しないようにした。
 
 ### 学習ポイント（事実）
 
-- 破壊的操作に対する確認は、処理関数の先頭で confirm 判定と早期 return を行うことで、副作用の境界を明確に保てる。
-- 「編集中要素の削除時にのみ編集状態を解除する」仕様は、削除確定後に条件分岐を置くことで既存の UX を壊さず拡張できる。
+- 共通クラス（`field--inline`）をベースに、画面限定クラスを重ねると、再利用性を保ちながら影響範囲を安全に限定できる。
+- `textarea` を含む行は `align-items: flex-start` を局所適用することで、ラベルを自然に上端揃えできる。
 
 ### 確認内容（事実）
 
-- `npm run build` を実行し、TypeScript コンパイルと Vite ビルドが成功した。
-- 材料削除ボタンの `aria-label="材料を削除"` が維持されていることを確認した。
-- 削除確認ロジックの変更対象が `RecipeForm` の材料削除処理に限定されていることを確認した。
+- `npm run build` を実行し、TypeScript コンパイルおよび Vite ビルド成功を確認した。
+- 変更対象が `RecipeForm` とそのスタイルに限定され、`IngredientFormModal` / `NumberInputModal` / LocalStorage 処理に差分がないことを確認した。
+- `calculator` 画面専用クラス（例: `.recipe-select-field`, `.servings-row`）には差分がないことを確認した。
 
 ### 次にやること（推測）
 
-- ブラウザ上で、材料編集中に同一材料を削除したときの confirm `OK` / `キャンセル` それぞれのモーダル挙動を手動確認する。
-- 必要に応じて confirm 文言の統一（レシピ削除 confirm とのトーン統一）を検討する。
+- 実機幅（特に 320px〜390px）で、レシピ名行・説明行の折り返し時視認性を目視確認する。
+- 必要であればラベル幅や入力最小幅を微調整し、長文ラベル追加時にも崩れにくい設計に拡張する。
 
 ## 現在の実装概要（事実）
 
-- React + TypeScript + Vite による単一ページアプリ。
-- 画面モード切替で `calculator` / `new` / `edit` を表示する。
-- `new/edit` の `RecipeForm` がレシピ名・説明・基準分量・材料追加/編集/削除・保存操作を担当する。
-- 材料削除は `RecipeForm` 内で confirm を経由して確定する。
+- React + TypeScript + Vite の単一ページ構成。
+- 画面モード切替で `calculator` / `new` / `edit` を表示。
+- `new/edit` の `RecipeForm` は、上部入力欄（レシピ名・説明・基準分量）をラベル + 入力の inline ベースで表示し、材料編集セクションと保存操作を提供する。
 - 数値入力は `NumberInputModal`、材料追加/編集は `IngredientFormModal` を利用する。
 
 ## 現在のデータ構造（事実）
@@ -69,11 +71,11 @@
   - 材料一覧（換算結果）
   - 説明表示
 - `new` / `edit` 画面（`RecipeForm`）
-  - レシピ名入力
-  - 説明入力（textarea）
-  - 基準分量入力（`NumberInputModal` 起点）
+  - レシピ名行（`レシピ名:` + 入力欄）
+  - 説明行（`説明:` + `textarea`）
+  - 基準分量行（`基準分量:` + 入力欄、`NumberInputModal` 起点）
   - 材料見出し行（`材料` + `材料追加`）
-  - 材料一覧（編集/削除アイコン、削除時 confirm）
+  - 材料一覧（編集/削除アイコン）
   - 保存/キャンセル（編集時は削除も表示）
 - モーダル
   - `IngredientFormModal`

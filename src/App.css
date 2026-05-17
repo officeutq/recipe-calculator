@@ -89,6 +89,22 @@
   flex-wrap: wrap;
 }
 
+.field--inline-top {
+  align-items: flex-start;
+}
+
+.recipe-form-inline-field .inline-label {
+  padding-top: 12px;
+}
+
+.recipe-form-inline-field textarea {
+  flex: 1 1 280px;
+}
+
+.recipe-form-inline-field input:not(.base-amount-input) {
+  flex: 1 1 280px;
+}
+
 .base-amount-input {
   width: 112px;
 }
