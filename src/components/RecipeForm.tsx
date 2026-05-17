@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import NumberInputModal from "./NumberInputModal"
 import IngredientFormModal from "./IngredientFormModal"
 import type { Ingredient, Recipe } from "../types/ingredient"
@@ -30,15 +30,17 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel, onDelete }: Recipe
   const [editingIngredientId, setEditingIngredientId] = useState<number | null>(null)
   const [isBaseAmountModalOpen, setIsBaseAmountModalOpen] = useState(false)
   const [isIngredientModalOpen, setIsIngredientModalOpen] = useState(false)
+  const [prevInitialRecipe, setPrevInitialRecipe] = useState(initialRecipe)
 
-  useEffect(() => {
+  if (prevInitialRecipe !== initialRecipe) {
     setName(initialRecipe?.name ?? "")
     setDescription(initialRecipe?.description ?? "")
     setBaseAmount(initialRecipe ? String(initialRecipe.baseAmount) : "")
     setIngredients(initialRecipe?.ingredients ?? [])
     setEditingIngredientId(null)
     setIsIngredientModalOpen(false)
-  }, [initialRecipe])
+    setPrevInitialRecipe(initialRecipe)
+  }
 
   const editingIngredient = editingIngredientId === null
     ? undefined

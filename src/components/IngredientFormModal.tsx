@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import NumberInputModal from "./NumberInputModal"
 import type { Ingredient } from "../types/ingredient"
 
@@ -19,17 +19,21 @@ function IngredientFormModal({ open, title, initialIngredient, onClose, onSave }
   const [amount, setAmount] = useState("0")
   const [unit, setUnit] = useState("")
   const [isAmountModalOpen, setIsAmountModalOpen] = useState(false)
+  const [prevOpen, setPrevOpen] = useState(open)
+  const [prevInitialIngredient, setPrevInitialIngredient] = useState(initialIngredient)
 
-  useEffect(() => {
-    if (!open) {
-      return
-    }
-
+  if (open && (!prevOpen || prevInitialIngredient !== initialIngredient)) {
     setName(initialIngredient?.name ?? "")
     setAmount(initialIngredient ? String(initialIngredient.amount) : "0")
     setUnit(initialIngredient?.unit ?? "")
     setIsAmountModalOpen(false)
-  }, [open, initialIngredient])
+    setPrevOpen(open)
+    setPrevInitialIngredient(initialIngredient)
+  }
+
+  if (!open && prevOpen) {
+    setPrevOpen(open)
+  }
 
   if (!open) {
     return null
