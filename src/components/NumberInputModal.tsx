@@ -31,18 +31,18 @@ const KEY_BUTTONS: KeyButton[] = [
 
 function NumberInputModal({
   open,
-  value,
+  value: _value,
   allowDecimal = true,
   onClose,
   onConfirm,
 }: NumberInputModalProps) {
-  const [inputValue, setInputValue] = useState(value)
+  const [inputValue, setInputValue] = useState("0")
 
   useEffect(() => {
     if (open) {
-      setInputValue(value)
+      setInputValue("0")
     }
-  }, [open, value])
+  }, [open])
 
   if (!open) {
     return null
@@ -50,7 +50,14 @@ function NumberInputModal({
 
   const handleKeyPress = (key: string) => {
     if (key === "backspace") {
-      setInputValue((prev) => prev.slice(0, -1))
+      setInputValue((prev) => {
+        if (prev.length <= 1) {
+          return "0"
+        }
+
+        const next = prev.slice(0, -1)
+        return next === "" ? "0" : next
+      })
       return
     }
 
@@ -58,9 +65,18 @@ function NumberInputModal({
       if (!allowDecimal || inputValue.includes(".")) {
         return
       }
+
+      setInputValue((prev) => (prev === "0" ? "0." : `${prev}.`))
+      return
     }
 
-    setInputValue((prev) => `${prev}${key}`)
+    setInputValue((prev) => {
+      if (prev === "0") {
+        return key
+      }
+
+      return `${prev}${key}`
+    })
   }
 
   return (
@@ -88,9 +104,9 @@ function NumberInputModal({
         </div>
 
         <div className="number-input-actions">
-          <button type="button" onClick={() => setInputValue("")}>クリア</button>
+          <button type="button" onClick={() => setInputValue("0")}>クリア</button>
           <button type="button" onClick={onClose}>キャンセル</button>
-          <button type="button" onClick={() => onConfirm(inputValue)}>決定</button>
+          <button type="button" onClick={() => onConfirm(inputValue === "" ? "0" : inputValue)}>決定</button>
         </div>
       </div>
     </div>
