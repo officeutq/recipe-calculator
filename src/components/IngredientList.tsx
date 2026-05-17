@@ -1,3 +1,4 @@
+import formatAmount from "../utils/formatAmount"
 import type { Ingredient } from "../types/ingredient"
 
 type IngredientListProps = {
@@ -21,7 +22,7 @@ function IngredientList({ ingredients, scale }: IngredientListProps) {
                 {ingredient.unit}
               </span>
               <span aria-hidden="true">→</span>
-              <span>{scaledAmount === null ? "-" : `${scaledAmount}${ingredient.unit}`}</span>
+              <span>{scaledAmount === null ? "-" : `${formatAmount(scaledAmount)}${ingredient.unit}`}</span>
             </span>
           </li>
         )
