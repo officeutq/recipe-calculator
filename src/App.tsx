@@ -171,13 +171,6 @@ function App() {
 
       {screenMode === "calculator" && (
         <section className="recipe-card recipe-card--calculator">
-          <div className="recipe-action-buttons">
-            <button type="button" onClick={() => setScreenMode("new")}>レシピ新規作成</button>
-            {hasRecipes && selectedRecipe && (
-              <button type="button" onClick={() => setScreenMode("edit")}>レシピ編集</button>
-            )}
-          </div>
-
           <div className="form-grid">
             {hasRecipes ? (
               <>
@@ -215,6 +208,13 @@ function App() {
               </>
             ) : (
               <p className="empty-state-message">レシピがありません</p>
+            )}
+          </div>
+
+          <div className="recipe-action-buttons">
+            <button type="button" onClick={() => setScreenMode("new")}>レシピ新規作成</button>
+            {hasRecipes && selectedRecipe && (
+              <button type="button" onClick={() => setScreenMode("edit")}>レシピ編集</button>
             )}
           </div>
 
