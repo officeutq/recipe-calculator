@@ -25,6 +25,12 @@ const initialRecipes: Recipe[] = [
 
 type ScreenMode = "calculator" | "new" | "edit"
 
+type RecipeFormValues = {
+  name: string
+  description: string
+  baseAmount: string
+}
+
 const storageKeys = {
   recipes: "recipe-calculator:recipes",
   selectedRecipeId: "recipe-calculator:selected-recipe-id",
@@ -58,6 +64,66 @@ function App() {
   const targetServingsNumber = Number(targetServings)
   const canCalculate = baseServingsNumber > 0 && targetServingsNumber > 0
   const scale = canCalculate ? targetServingsNumber / baseServingsNumber : null
+
+  const validateRecipeFormValues = (values: RecipeFormValues): number | null => {
+    const name = values.name.trim()
+    if (name === "") {
+      alert("レシピ名を入力してください")
+      return null
+    }
+
+    const baseAmount = Number(values.baseAmount)
+    if (!Number.isFinite(baseAmount) || baseAmount < 1) {
+      alert("基準量は1以上を入力してください")
+      return null
+    }
+
+    return baseAmount
+  }
+
+  const handleSaveNewRecipe = (values: RecipeFormValues) => {
+    const baseAmount = validateRecipeFormValues(values)
+    if (baseAmount === null) {
+      return
+    }
+
+    const newRecipe: Recipe = {
+      id: Date.now(),
+      name: values.name.trim(),
+      description: values.description.trim(),
+      baseAmount,
+      ingredients: [],
+    }
+
+    setRecipes((prevRecipes) => [...prevRecipes, newRecipe])
+    setSelectedRecipeId(newRecipe.id)
+    setScreenMode("calculator")
+  }
+
+  const handleSaveEditedRecipe = (values: RecipeFormValues) => {
+    if (!selectedRecipe) {
+      return
+    }
+
+    const baseAmount = validateRecipeFormValues(values)
+    if (baseAmount === null) {
+      return
+    }
+
+    const updatedRecipe: Recipe = {
+      ...selectedRecipe,
+      name: values.name.trim(),
+      description: values.description.trim(),
+      baseAmount,
+    }
+
+    setRecipes((prevRecipes) =>
+      prevRecipes.map((recipe) =>
+        recipe.id === updatedRecipe.id ? updatedRecipe : recipe,
+      ),
+    )
+    setScreenMode("calculator")
+  }
 
   const handleResetRecipe = () => {
     setRecipes(initialRecipes)
@@ -141,7 +207,7 @@ function App() {
       {screenMode === "new" && (
         <RecipeForm
           title="レシピ新規作成"
-          onSave={() => console.log("save new")}
+          onSave={handleSaveNewRecipe}
           onCancel={() => setScreenMode("calculator")}
         />
       )}
@@ -150,7 +216,7 @@ function App() {
         <RecipeForm
           title="レシピ編集"
           initialRecipe={selectedRecipe}
-          onSave={() => console.log("save edit")}
+          onSave={handleSaveEditedRecipe}
           onCancel={() => setScreenMode("calculator")}
         />
       )}
