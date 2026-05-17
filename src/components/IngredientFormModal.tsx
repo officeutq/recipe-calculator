@@ -79,7 +79,7 @@ function IngredientFormModal({ open, title, initialIngredient, onClose, onSave }
               <span className="inline-label">材料名:</span>
               <input
                 type="text"
-                placeholder="カレー"
+                placeholder="材料名"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
               />
