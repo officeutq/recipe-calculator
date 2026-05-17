@@ -172,3 +172,19 @@
 .form-actions {
   margin-top: 20px;
 }
+
+.ingredient-editor-grid {
+  grid-template-columns: 1fr;
+  margin-bottom: 16px;
+}
+
+.ingredient-edit-list .ingredient-item button,
+.ingredient-editor-grid button {
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}

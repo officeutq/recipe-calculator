@@ -1,6 +1,6 @@
 import "./App.css"
 import IngredientList from "./components/IngredientList"
-import RecipeForm from "./components/RecipeForm"
+import RecipeForm, { type RecipeFormValues } from "./components/RecipeForm"
 import { useLocalStorageState } from "./hooks/useLocalStorageState"
 import type { Ingredient, Recipe } from "./types/ingredient"
 
@@ -24,12 +24,6 @@ const initialRecipes: Recipe[] = [
 ]
 
 type ScreenMode = "calculator" | "new" | "edit"
-
-type RecipeFormValues = {
-  name: string
-  description: string
-  baseAmount: string
-}
 
 const storageKeys = {
   recipes: "recipe-calculator:recipes",
@@ -92,7 +86,7 @@ function App() {
       name: values.name.trim(),
       description: values.description.trim(),
       baseAmount,
-      ingredients: [],
+      ingredients: values.ingredients,
     }
 
     setRecipes((prevRecipes) => [...prevRecipes, newRecipe])
@@ -115,6 +109,7 @@ function App() {
       name: values.name.trim(),
       description: values.description.trim(),
       baseAmount,
+      ingredients: values.ingredients,
     }
 
     setRecipes((prevRecipes) =>
