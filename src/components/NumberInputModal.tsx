@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import type { ReactNode } from "react"
 
 type NumberInputModalProps = {
@@ -31,18 +31,23 @@ const KEY_BUTTONS: KeyButton[] = [
 
 function NumberInputModal({
   open,
-  value: _value,
+  value,
   allowDecimal = true,
   onClose,
   onConfirm,
 }: NumberInputModalProps) {
+  void value
   const [inputValue, setInputValue] = useState("0")
+  const [prevOpen, setPrevOpen] = useState(open)
 
-  useEffect(() => {
-    if (open) {
-      setInputValue("0")
-    }
-  }, [open])
+  if (open && !prevOpen) {
+    setInputValue("0")
+    setPrevOpen(open)
+  }
+
+  if (!open && prevOpen) {
+    setPrevOpen(open)
+  }
 
   if (!open) {
     return null
