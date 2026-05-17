@@ -120,3 +120,39 @@ npx cap sync ios
 - 手動操作で `new` / `edit` の「材料 0 件保存」時のアラート表示タイミングを再確認
 - 必要に応じて、材料セクションにインラインエラー表示を追加して UX を改善
 - 将来の拡張として、React Router による画面分離や API 永続化への移行を検討
+
+## TestFlight配布手順（初回〜継続運用）
+
+### 初回TestFlightで実施したこと（完了済みの事実）
+
+- App Store Connect にアプリを作成
+- Bundle ID を登録
+- 輸出コンプライアンス情報を入力
+- TestFlight の内部テストグループを作成
+- テスターを追加
+- iPhone の TestFlight アプリからインストール成功
+- App Store Connect に `1.0.0 (1)` をアップロード
+
+### TestFlight配布までの基本手順
+
+1. React 側の修正を実装
+2. `npm run lint` / `npm run build` を実行
+3. `npx cap sync ios` を実行して iOS 側へ反映
+4. Xcode で `Version` / `Build` を確認
+5. Archive を作成
+6. App Store Connect へ Upload
+7. TestFlight の内部テストグループで配布
+8. iPhone の TestFlight アプリで更新確認
+
+### 次回以降の更新手順（毎回）
+
+1. React 側修正
+2. `npm run build`
+3. `npx cap sync ios`
+4. iOS Build Number（`CURRENT_PROJECT_VERSION`）を **+1**
+5. Xcode で Archive
+6. App Store Connect へ Upload
+7. TestFlight で更新確認
+
+> 注意: 同じ Marketing Version のまま再アップロードする場合でも、Build Number は必ず増やす。
+

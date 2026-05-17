@@ -6,7 +6,7 @@
 
 React + TypeScript で、登録済みレシピを選択し、作成量に応じて材料分量を換算する。
 
-Capacitor を導入済みで、React / Vite アプリを iOS アプリとして実機確認できる構成にしている。
+Capacitor を導入済みで、React / Vite アプリを iOS アプリとして実機確認・TestFlight内部配布まで完了している構成。
 
 Android 対応は今後の予定。
 
@@ -68,6 +68,7 @@ type Ingredient = {
 * React / TypeScript 側を主実装とする
 * iOS固有実装は最小限にする
 * React変更後は必ず iOS同期を行う
+* TestFlight更新手順を変更した場合は README と docs/implementation-log.md を同時に更新する
 * Capacitor生成ファイルを勝手に大きく変更しない
 * Xcode設定変更は必要最小限にする
 
@@ -226,3 +227,14 @@ implementation-log.md 更新時追加ルール:
 - 「現在の実装概要」「現在の画面構成」「現在のデータ構造」は最新状態へ置き換える
 - 過去状態と現在状態が矛盾しないこと
 - 推測ではなくコードと現在実装を優先する
+
+## Current Status
+
+- 更新日: 2026-05-17
+- 現在の実装概要: React + TypeScript + Vite + Capacitor で iOS 実機確認と TestFlight 内部配布まで完了。
+- 現在の画面構成: `calculator` / `new` / `edit` の画面モード切替 + `IngredientFormModal` / `NumberInputModal`。
+- 次にやること: 次回配布時の Build Number 増分運用を継続し、運用変更時は README / implementation-log を同期更新。
+
+## Cleanup Notes
+
+- 完了済みの TestFlight到達項目（内部テストグループ作成・テスター追加・iPhoneインストール成功）は「今後の検討事項」へ戻さない。
