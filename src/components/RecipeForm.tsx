@@ -80,6 +80,12 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel, onDelete }: Recipe
   }
 
   const handleRemoveIngredient = (ingredientId: number) => {
+    const shouldDeleteIngredient = window.confirm("この材料を削除しますか？")
+
+    if (!shouldDeleteIngredient) {
+      return
+    }
+
     setIngredients((prevIngredients) =>
       prevIngredients.filter((ingredient) => ingredient.id !== ingredientId),
     )
