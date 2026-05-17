@@ -433,6 +433,32 @@
   margin-top: 12px;
 }
 
+.ingredient-form-inline-field {
+  flex-wrap: nowrap;
+}
+
+.ingredient-form-inline-field .inline-label {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  padding-top: 0;
+}
+
+.ingredient-form-inline-field input {
+  min-width: 0;
+}
+
+.ingredient-form-inline-field .ingredient-form-amount-input {
+  flex: 0 1 96px;
+}
+
+.ingredient-form-inline-field .ingredient-form-unit-input {
+  flex: 1 1 auto;
+}
+
+.ingredient-form-inline-field--single {
+  gap: 10px;
+}
+
 .ingredient-form-modal-actions {
   display: flex;
   gap: 8px;
