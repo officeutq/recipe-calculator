@@ -2,6 +2,13 @@
 
 作成日: 2026-05-17
 更新日: 2026-05-18
+## 更新履歴（2026-05-18）
+
+- `App.css` の `.app` に Safe Area 対応の上下余白を追加した（`env(safe-area-inset-top/bottom)` を使用）。
+- `App.tsx` に下部クレジット `© 2026 Office UTQ Inc.` を追加した。
+- 対応目的は、Capacitor/iOSアプリ表示時にノッチ・ホームインジケータ近傍の見た目を改善すること。
+- `npm run lint` / `npm run build` の成功を確認した。
+
 ## 更新履歴（2026-05-17）
 
 - `IngredientFormModal` / `NumberInputModal` / `RecipeForm` の lint エラー解消を実施した。
@@ -53,6 +60,7 @@
 - 画面モード切替（`calculator` / `new` / `edit`）で操作する構成。
 - レシピ作成・編集は `RecipeForm`、材料入力は `IngredientFormModal`、数値入力は `NumberInputModal` を利用。
 - 永続化は LocalStorage。
+- Capacitor/iOS表示を考慮し、ルートの上下余白は Safe Area を加味する。
 
 ## 現在のデータ構造
 
@@ -74,6 +82,8 @@
   - アプリラベル
   - タイトル
   - 説明文
+- 画面下部
+  - クレジット表示（`© 2026 Office UTQ Inc.`）
 - `calculator` 画面
   - レシピ選択
   - レシピ新規作成/編集ボタン

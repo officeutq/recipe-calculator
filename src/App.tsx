@@ -277,6 +277,10 @@ function App() {
           onDelete={handleDeleteRecipe}
         />
       )}
+
+      <p className="app-credit" aria-label="credit">
+        © 2026 Office UTQ Inc.
+      </p>
     </main>
   )
 }
