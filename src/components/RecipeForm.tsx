@@ -29,6 +29,7 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel }: RecipeFormProps)
   const [ingredientAmount, setIngredientAmount] = useState("")
   const [ingredientUnit, setIngredientUnit] = useState("")
   const [isBaseAmountModalOpen, setIsBaseAmountModalOpen] = useState(false)
+  const [isIngredientAmountModalOpen, setIsIngredientAmountModalOpen] = useState(false)
 
   useEffect(() => {
     setName(initialRecipe?.name ?? "")
@@ -124,11 +125,12 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel }: RecipeFormProps)
 
           <label className="field">
             <input
-              type="number"
-              min="0"
+              type="text"
+              inputMode="none"
               placeholder="分量"
               value={ingredientAmount}
-              onChange={(event) => setIngredientAmount(event.target.value)}
+              readOnly
+              onClick={() => setIsIngredientAmountModalOpen(true)}
             />
           </label>
 
@@ -159,6 +161,17 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel }: RecipeFormProps)
         </ul>
       </div>
 
+
+      <NumberInputModal
+        open={isIngredientAmountModalOpen}
+        value={ingredientAmount}
+        allowDecimal
+        onClose={() => setIsIngredientAmountModalOpen(false)}
+        onConfirm={(value) => {
+          setIngredientAmount(value)
+          setIsIngredientAmountModalOpen(false)
+        }}
+      />
 
       <NumberInputModal
         open={isBaseAmountModalOpen}
