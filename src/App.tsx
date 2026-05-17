@@ -1,6 +1,11 @@
+import { useState } from "react"
 import "./App.css"
 
 function App() {
+  const [recipeName, setRecipeName] = useState("")
+  const [baseServings, setBaseServings] = useState("4")
+  const [targetServings, setTargetServings] = useState("2")
+
   return (
     <main className="app">
       <section className="app-header">
@@ -17,18 +22,53 @@ function App() {
         <div className="form-grid">
           <label className="field">
             <span>レシピ名</span>
-            <input type="text" placeholder="例：カレー" />
+            <input
+              type="text"
+              placeholder="例：カレー"
+              value={recipeName}
+              onChange={(event) => setRecipeName(event.target.value)}
+            />
           </label>
 
           <label className="field">
             <span>基準人数</span>
-            <input type="number" min="1" placeholder="例：4" />
+            <input
+              type="number"
+              min="1"
+              placeholder="例：4"
+              value={baseServings}
+              onChange={(event) => setBaseServings(event.target.value)}
+            />
           </label>
 
           <label className="field">
             <span>作りたい人数</span>
-            <input type="number" min="1" placeholder="例：6" />
+            <input
+              type="number"
+              min="1"
+              placeholder="例：6"
+              value={targetServings}
+              onChange={(event) => setTargetServings(event.target.value)}
+            />
           </label>
+        </div>
+
+        <div className="preview-section">
+          <h2>入力内容</h2>
+          <dl className="preview-list">
+            <div>
+              <dt>レシピ名</dt>
+              <dd>{recipeName || "未入力"}</dd>
+            </div>
+            <div>
+              <dt>基準人数</dt>
+              <dd>{baseServings || "未入力"}人分</dd>
+            </div>
+            <div>
+              <dt>作りたい人数</dt>
+              <dd>{targetServings || "未入力"}人分</dd>
+            </div>
+          </dl>
         </div>
 
         <div className="ingredients-section">
