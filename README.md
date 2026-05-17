@@ -67,7 +67,7 @@ npm run preview
   - `webDir`: `dist`
 - iOS（`ios/App/App.xcodeproj/project.pbxproj`）
   - Bundle Identifier: `jp.co.officeutq.recipecalculator`
-  - Version（`MARKETING_VERSION`）: `1.0`
+  - Version（`MARKETING_VERSION`）: `1.0.0`
   - Build（`CURRENT_PROJECT_VERSION`）: `1`
 - iOS（`ios/App/App/Info.plist`）
   - 表示アプリ名（`CFBundleDisplayName`）: `レシピ計算機`
@@ -103,6 +103,17 @@ npx cap sync ios
 - 実機で主要機能の回帰確認が完了している
 - Version / Build番号を今回リリース用に見直している
 - App Store Connect に登録するアプリ情報（名前、説明、スクリーンショット等）の準備方針を決めている
+
+
+## バージョン運用ルール（iOS / TestFlight）
+
+- Marketing Version は `major.minor.patch` 形式で管理する（例: `1.0.0`）。
+- Build Number（`CURRENT_PROJECT_VERSION`）は整数で管理し、同じ Version 内でもアップロードのたびに必ず増やす（例: `1` → `2` → `3`）。
+- TestFlight へ再アップロードする場合、Marketing Version が同じでも Build Number は必ず増やす。
+- 小さな不具合修正は patch を上げる（例: `1.0.0` → `1.0.1`）。
+- 小さな機能追加は minor を上げる（例: `1.0.0` → `1.1.0`）。
+- 大きな仕様変更や互換性のない変更は major を上げる（例: `1.0.0` → `2.0.0`）。
+- 現在の運用開始値は Version `1.0.0` / Build `1` とする。
 
 ## 今後の予定
 

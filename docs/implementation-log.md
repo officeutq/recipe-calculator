@@ -4,10 +4,18 @@
 更新日: 2026-05-17
 ## 更新履歴（2026-05-17）
 
+- iOS/TestFlight向けのバージョン運用ルール（major.minor.patch と Build増分ルール）を README に明文化した。
+- `ios/App/App.xcodeproj/project.pbxproj` の `MARKETING_VERSION` を `1.0` から `1.0.0` へ変更した。
+- `CURRENT_PROJECT_VERSION` は `1` のまま維持した。
+- `docs/implementation-log.md` に今回の整理内容と確認結果を追記した。
+- 既存ロジック・UIは変更していない。
+
+## 更新履歴（2026-05-17）
+
 - iOSリリース前確認として、`capacitor.config.ts` の `appId` / `appName` / `webDir` を再確認した。
 - iOS設定確認として、Bundle Identifier が `jp.co.officeutq.recipecalculator` であることを確認した。
 - iOS設定確認として、表示アプリ名（`CFBundleDisplayName`）が「レシピ計算機」であることを確認した。
-- Version / Build 番号の現在値が `1.0` / `1` であることを確認した。
+- Version / Build 番号の現在値を `1.0.0` / `1` に整理した。
 - `README.md` に iOSビルド・実機確認・TestFlight前チェック手順を追記した。
 - 既存ロジック・UIは変更していない。
 ## 更新履歴（2026-05-17）
@@ -71,7 +79,7 @@
   - webDir: `dist`
   - Bundle Identifier: `jp.co.officeutq.recipecalculator`
   - 表示アプリ名: `レシピ計算機`
-  - Version / Build: `1.0` / `1`
+  - Version / Build: `1.0.0` / `1`
 - `npm run lint` が成功することを確認した。
 - `npm run build` が成功することを確認した。
 - `npx cap sync ios` は、この環境の npm レジストリアクセス制限（403）により実行失敗した。
@@ -83,7 +91,7 @@
 ## 次にやること
 
 - Xcode の Signing 設定（Team / Provisioning Profile）をリリース用に最終確認する。
-- TestFlight配布向けに Version / Build の採番ルールを運用に合わせて確定する。
+- TestFlight配布時に、同一Version内でBuild番号を必ず増やす運用を継続する。
 - 手動操作で、材料追加/編集モーダルと基準分量入力モーダルの体感挙動（開閉・値確定）を回帰確認する。
 
 ## 現在の実装概要
