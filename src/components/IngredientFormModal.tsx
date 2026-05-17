@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react"
 import NumberInputModal from "./NumberInputModal"
+import type { Ingredient } from "../types/ingredient"
 
 type IngredientFormModalProps = {
   open: boolean
   title: string
+  initialIngredient?: Ingredient
   onClose: () => void
   onSave: (ingredient: {
     name: string
@@ -12,9 +14,9 @@ type IngredientFormModalProps = {
   }) => void
 }
 
-function IngredientFormModal({ open, title, onClose, onSave }: IngredientFormModalProps) {
+function IngredientFormModal({ open, title, initialIngredient, onClose, onSave }: IngredientFormModalProps) {
   const [name, setName] = useState("")
-  const [amount, setAmount] = useState("")
+  const [amount, setAmount] = useState("0")
   const [unit, setUnit] = useState("")
   const [isAmountModalOpen, setIsAmountModalOpen] = useState(false)
 
@@ -23,11 +25,11 @@ function IngredientFormModal({ open, title, onClose, onSave }: IngredientFormMod
       return
     }
 
-    setName("")
-    setAmount("")
-    setUnit("")
+    setName(initialIngredient?.name ?? "")
+    setAmount(initialIngredient ? String(initialIngredient.amount) : "0")
+    setUnit(initialIngredient?.unit ?? "")
     setIsAmountModalOpen(false)
-  }, [open])
+  }, [open, initialIngredient])
 
   if (!open) {
     return null
