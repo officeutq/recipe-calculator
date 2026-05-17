@@ -1,5 +1,6 @@
 import { useState } from "react"
 import "./App.css"
+import IngredientList from "./components/IngredientList"
 
 type Ingredient = {
   id: number
@@ -173,41 +174,11 @@ function App() {
             </button>
           </div>
 
-          <ul className="ingredient-list">
-            {ingredients.map((ingredient) => {
-              const scaledAmount =
-                scale === null ? null : ingredient.amount * scale
-
-              return (
-                <li className="ingredient-item" key={ingredient.id}>
-                  <span className="ingredient-name">{ingredient.name}</span>
-
-                  <span className="ingredient-actions">
-                    <span className="ingredient-amount">
-                      <span className="original-amount">
-                        {ingredient.amount}
-                        {ingredient.unit}
-                      </span>
-                      <span aria-hidden="true">→</span>
-                      <span>
-                        {scaledAmount === null
-                          ? "-"
-                          : `${scaledAmount}${ingredient.unit}`}
-                      </span>
-                    </span>
-
-                    <button
-                      type="button"
-                      className="remove-button"
-                      onClick={() => handleRemoveIngredient(ingredient.id)}
-                    >
-                      削除
-                    </button>
-                  </span>
-                </li>
-              )
-            })}
-          </ul>
+          <IngredientList
+            ingredients={ingredients}
+            scale={scale}
+            onRemoveIngredient={handleRemoveIngredient}
+          />
         </div>
       </section>
     </main>
