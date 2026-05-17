@@ -1,8 +1,7 @@
 import "./App.css"
-import IngredientForm from "./components/IngredientForm"
 import IngredientList from "./components/IngredientList"
 import { useLocalStorageState } from "./hooks/useLocalStorageState"
-import type { Ingredient, NewIngredient, Recipe } from "./types/ingredient"
+import type { Ingredient, Recipe } from "./types/ingredient"
 
 const initialTargetServings = "2"
 
@@ -16,8 +15,8 @@ const initialIngredients: Ingredient[] = [
 const initialRecipes: Recipe[] = [
   {
     id: 1,
-    name: "",
-    description: "",
+    name: "カレー",
+    description: "定番の家庭用カレー",
     baseAmount: 4,
     ingredients: initialIngredients,
   },
@@ -34,74 +33,29 @@ function App() {
     storageKeys.recipes,
     initialRecipes,
   )
-  const [selectedRecipeId, setSelectedRecipeId] = useLocalStorageState<number>(
+  const [selectedRecipeId, setSelectedRecipeId] = useLocalStorageState<number | null>(
     storageKeys.selectedRecipeId,
-    initialRecipes[0].id,
+    null,
   )
   const [targetServings, setTargetServings] = useLocalStorageState(
     storageKeys.targetServings,
     initialTargetServings,
   )
 
-  const selectedRecipe =
-    recipes.find((recipe) => recipe.id === selectedRecipeId) ?? recipes[0]
-
-  const baseServings = selectedRecipe ? String(selectedRecipe.baseAmount) : ""
-  const recipeName = selectedRecipe?.name ?? ""
-  const ingredients = selectedRecipe?.ingredients ?? []
+  const selectedRecipe = recipes.find((recipe) => recipe.id === selectedRecipeId)
 
   const baseServingsNumber = selectedRecipe?.baseAmount ?? 0
+  const ingredients = selectedRecipe?.ingredients ?? []
+  const description = selectedRecipe?.description ?? ""
+
   const targetServingsNumber = Number(targetServings)
   const canCalculate = baseServingsNumber > 0 && targetServingsNumber > 0
   const scale = canCalculate ? targetServingsNumber / baseServingsNumber : null
 
-  const updateSelectedRecipe = (updater: (recipe: Recipe) => Recipe) => {
-    setRecipes(
-      recipes.map((recipe) =>
-        recipe.id === selectedRecipeId ? updater(recipe) : recipe,
-      ),
-    )
-  }
-
-  const handleAddIngredient = (newIngredient: NewIngredient) => {
-    const nextIngredient: Ingredient = {
-      id: Date.now(),
-      ...newIngredient,
-    }
-
-    updateSelectedRecipe((recipe) => ({
-      ...recipe,
-      ingredients: [...recipe.ingredients, nextIngredient],
-    }))
-  }
-
-  const handleRemoveIngredient = (id: number) => {
-    updateSelectedRecipe((recipe) => ({
-      ...recipe,
-      ingredients: recipe.ingredients.filter((ingredient) => ingredient.id !== id),
-    }))
-  }
-
   const handleResetRecipe = () => {
     setRecipes(initialRecipes)
-    setSelectedRecipeId(initialRecipes[0].id)
+    setSelectedRecipeId(null)
     setTargetServings(initialTargetServings)
-  }
-
-  const handleRecipeNameChange = (name: string) => {
-    updateSelectedRecipe((recipe) => ({
-      ...recipe,
-      name,
-    }))
-  }
-
-  const handleBaseServingsChange = (value: string) => {
-    const parsedValue = Number(value)
-
-    updateSelectedRecipe((recipe) => ({
-      ...recipe,
-      baseAmount: Number.isNaN(parsedValue) ? 0 : parsedValue,
-    }))
   }
 
   return (
@@ -126,60 +80,44 @@ function App() {
           </button>
         </div>
 
+        <div className="recipe-action-buttons">
+          <button type="button" onClick={() => console.log("new")}>レシピ新規作成</button>
+          {selectedRecipeId !== null && (
+            <button type="button" onClick={() => console.log("edit")}>レシピ編集</button>
+          )}
+        </div>
+
         <div className="form-grid">
           <label className="field">
-            <span>レシピ名</span>
-            <input
-              type="text"
-              placeholder="例：カレー"
-              value={recipeName}
-              onChange={(event) => handleRecipeNameChange(event.target.value)}
-            />
+            <select
+              value={selectedRecipeId ?? ""}
+              onChange={(event) => {
+                const nextValue = event.target.value
+                setSelectedRecipeId(nextValue === "" ? null : Number(nextValue))
+              }}
+            >
+              <option value="">レシピ名</option>
+              {recipes.map((recipe) => (
+                <option key={recipe.id} value={recipe.id}>
+                  {recipe.name}
+                </option>
+              ))}
+            </select>
           </label>
 
+          {selectedRecipe && <p className="recipe-description">{description}</p>}
+
+          <p className="base-amount">基準量: {baseServingsNumber || "-"}</p>
+
           <label className="field">
-            <span>基準人数</span>
             <input
               type="number"
               min="1"
-              placeholder="例：4"
-              value={baseServings}
-              onChange={(event) => handleBaseServingsChange(event.target.value)}
-            />
-          </label>
-
-          <label className="field">
-            <span>作りたい人数</span>
-            <input
-              type="number"
-              min="1"
-              placeholder="例：6"
+              placeholder="作成量"
               value={targetServings}
               onChange={(event) => setTargetServings(event.target.value)}
             />
           </label>
-        </div>
-
-        <div className="preview-section">
-          <h2>入力内容</h2>
-          <dl className="preview-list">
-            <div>
-              <dt>レシピ名</dt>
-              <dd>{recipeName || "未入力"}</dd>
-            </div>
-            <div>
-              <dt>基準人数</dt>
-              <dd>{baseServings || "未入力"}人分</dd>
-            </div>
-            <div>
-              <dt>作りたい人数</dt>
-              <dd>{targetServings || "未入力"}人分</dd>
-            </div>
-            <div>
-              <dt>倍率</dt>
-              <dd>{scale === null ? "計算不可" : `${scale}倍`}</dd>
-            </div>
-          </dl>
         </div>
 
         <div className="ingredients-section">
@@ -187,13 +125,7 @@ function App() {
             <h2>材料</h2>
           </div>
 
-          <IngredientForm onAddIngredient={handleAddIngredient} />
-
-          <IngredientList
-            ingredients={ingredients}
-            scale={scale}
-            onRemoveIngredient={handleRemoveIngredient}
-          />
+          <IngredientList ingredients={ingredients} scale={scale} />
         </div>
       </section>
     </main>
