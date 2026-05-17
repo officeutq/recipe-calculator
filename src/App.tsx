@@ -214,7 +214,12 @@ function App() {
                 </div>
               </>
             ) : (
-              <p className="empty-state-message">レシピがありません</p>
+              <>
+                <p className="empty-state-message">レシピがありません</p>
+                <div className="recipe-action-buttons">
+                  <button type="button" onClick={() => setScreenMode("new")}>レシピ新規作成</button>
+                </div>
+              </>
             )}
           </div>
 
