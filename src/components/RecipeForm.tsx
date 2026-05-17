@@ -90,7 +90,7 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel, onDelete }: Recipe
   }
 
   return (
-    <section className="recipe-card" aria-labelledby="recipe-form-screen-title">
+    <section className="recipe-card recipe-card--form" aria-labelledby="recipe-form-screen-title">
       <h2 id="recipe-form-screen-title">{title}</h2>
 
       <div className="form-grid">
@@ -99,7 +99,12 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel, onDelete }: Recipe
         </label>
 
         <label className="field">
-          <input type="text" placeholder="説明" value={description} onChange={(event) => setDescription(event.target.value)} />
+          <textarea
+            placeholder="説明"
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+            rows={4}
+          />
         </label>
 
         <label className="field">
@@ -110,11 +115,10 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel, onDelete }: Recipe
       <div className="ingredients-section">
         <div className="section-header">
           <h2>材料</h2>
+          <button type="button" className="ingredient-add-button" onClick={handleOpenAddIngredientModal}>
+            材料追加
+          </button>
         </div>
-
-        <button type="button" onClick={handleOpenAddIngredientModal}>
-          材料追加
-        </button>
 
         <ul className="ingredient-list ingredient-edit-list">
           {ingredients.map((ingredient) => (
