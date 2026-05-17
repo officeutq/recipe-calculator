@@ -14,9 +14,10 @@ type RecipeFormProps = {
   initialRecipe?: Recipe
   onSave: (values: RecipeFormValues) => void
   onCancel: () => void
+  onDelete?: () => void
 }
 
-function RecipeForm({ title, initialRecipe, onSave, onCancel }: RecipeFormProps) {
+function RecipeForm({ title, initialRecipe, onSave, onCancel, onDelete }: RecipeFormProps) {
   const [name, setName] = useState(initialRecipe?.name ?? "")
   const [description, setDescription] = useState(initialRecipe?.description ?? "")
   const [baseAmount, setBaseAmount] = useState(
@@ -192,6 +193,9 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel }: RecipeFormProps)
           保存
         </button>
         <button type="button" onClick={onCancel}>キャンセル</button>
+        {onDelete && (
+          <button type="button" onClick={onDelete}>削除</button>
+        )}
       </div>
     </section>
   )
