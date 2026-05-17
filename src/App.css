@@ -234,6 +234,7 @@
   border-radius: 16px;
   background: #ffffff;
   color: #475569;
+  white-space: pre-wrap;
 }
 
 .base-amount {
