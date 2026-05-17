@@ -114,7 +114,7 @@
 
 .recipe-form-inline-field input:not(.base-amount-input),
 .recipe-form-inline-field .base-amount-input {
-  flex: 1 1 auto;
+  flex: 1 1 0;
   min-width: 0;
 }
 
@@ -448,11 +448,11 @@
 }
 
 .ingredient-form-inline-field .ingredient-form-amount-input {
-  flex: 0 1 96px;
+  flex: 1 1 0;
 }
 
 .ingredient-form-inline-field .ingredient-form-unit-input {
-  flex: 1 1 auto;
+  flex: 1 1 0;
 }
 
 .ingredient-form-inline-field--single {
