@@ -1,73 +1,64 @@
-# React + TypeScript + Vite
+# レシピ計算機
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## アプリ概要
 
-Currently, two official plugins are available:
+レシピ計算機は、登録したレシピの**基準分量**をもとに、作りたい分量へ材料を自動換算する Web アプリです。React + TypeScript + Vite で実装されており、スマートフォンでも扱いやすい操作性を重視しています。
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 主な機能
 
-## React Compiler
+- レシピの作成
+  - レシピ名・説明・基準分量・材料（名前/分量/単位）を入力して保存
+- レシピの編集・削除
+  - 既存レシピの内容更新と削除
+- 材料分量の自動換算
+  - 基準分量と今回の分量から、各材料の必要量を自動計算
+- 数値入力モーダル
+  - 基準分量や材料分量は専用の数値入力モーダルで入力
+- 保存時バリデーション
+  - レシピ名必須
+  - 基準分量は 1 以上
+  - 材料は 1 件以上必須
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 画面構成
 
-## Expanding the ESLint configuration
+本アプリは URL を分けず、画面モード切替で構成されています。
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- `calculator` 画面
+  - レシピ選択
+  - 新規作成/編集への遷移
+  - 基準分量表示・今回の分量入力
+  - 換算後の材料一覧表示
+  - レシピ説明表示
+- `new` 画面（レシピ新規作成）
+  - レシピ情報入力
+  - 材料の追加・編集・削除
+  - 保存/キャンセル
+- `edit` 画面（レシピ編集）
+  - レシピ情報入力
+  - 材料の追加・編集・削除
+  - 保存/キャンセル/削除
+- モーダル
+  - `IngredientFormModal`（材料入力）
+  - `NumberInputModal`（数値入力）
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## データ保存方式
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- 保存先: ブラウザの LocalStorage
+- 保存タイミング: レシピの新規保存・編集保存・削除時
+- 保存前チェック: 共通バリデーションを通過した場合のみ保存処理を実行
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## 開発コマンド
+
+```bash
+npm install
+npm run dev
+npm run lint
+npm run build
+npm run preview
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 今後の予定
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- 手動操作で `new` / `edit` の「材料 0 件保存」時のアラート表示タイミングを再確認
+- 必要に応じて、材料セクションにインラインエラー表示を追加して UX を改善
+- 将来の拡張として、React Router による画面分離や API 永続化への移行を検討
