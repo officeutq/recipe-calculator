@@ -5,64 +5,61 @@
 
 ## 更新履歴（2026-05-17）
 
-- IngredientFormModal の材料名プレースホルダーを「カレー」から「材料名」へ変更した。
-- IngredientFormModal の分量欄と単位欄の横幅バランスを、スマホ幅でも自然な 1:1 付近になるよう調整した。
-- IngredientFormModal の保存 / キャンセルボタンを 1:1 の等幅で横いっぱいに広がるよう調整した。
+- レシピ保存時バリデーションに「材料1件以上必須」を追加した。
+- バリデーション順序を「レシピ名 → 基準分量 → 材料件数」に維持・拡張した。
+- `new` / `edit` の保存フローは、バリデーション成功時のみ実行される既存仕様を維持した。
 
 ## 変更ファイル
 
-- `src/components/IngredientFormModal.tsx`
-- `src/App.css`
+- `src/App.tsx`
 - `docs/implementation-log.md`
 
 ## 実装内容
 
-- 材料名入力欄の placeholder を `材料名` に変更した。
-- 分量入力欄（`ingredient-form-amount-input`）の `flex` を `1 1 0` に変更した。
-- 単位入力欄（`ingredient-form-unit-input`）の `flex` を `1 1 0` に変更した。
-- 既存の `gap`（`ingredient-form-inline-field--single` の `gap: 10px`）は維持した。
-- モーダル下部のアクションボタン（保存 / キャンセル）に `flex: 1 1 0` を追加し、2 ボタンを等幅で親幅いっぱいに配置した。
-- アクション行の `gap: 8px` とボタン `padding: 10px 12px` は維持し、タップしやすさを維持した。
-- 分量入力は既存どおり readOnly + クリックで `NumberInputModal` を開く仕様を維持した。
-- 単位入力の state（`unit`）および保存処理（`onSave` 時の `trim` と保存値）は変更していない。
-- IngredientFormModal の保存処理・バリデーション・モーダル構造は変更していない。
+- `validateRecipeFormValues` に `values.ingredients.length < 1` の判定を追加した。
+- 材料が0件の場合は `alert("材料を1件以上追加してください")` を表示し、保存処理を中断するようにした。
+- 既存のバリデーション（レシピ名必須、基準分量1以上）は変更せず、実行順を以下に統一した。
+  1. レシピ名
+  2. 基準分量
+  3. 材料1件以上
+- `handleSaveNewRecipe` の以下処理は、バリデーション成功時のみ実行されることを維持した。
+  - レシピ追加
+  - `selectedRecipeId` 更新
+  - `calculator` 画面へ戻る
+- `handleSaveEditedRecipe` の以下処理は、バリデーション成功時のみ実行されることを維持した。
+  - レシピ更新
+  - `calculator` 画面へ戻る
+- 変更対象外として、以下には差分を加えていない。
+  - 材料追加/編集モーダル
+  - `NumberInputModal`
+  - LocalStorage
+  - `calculator` 画面
+  - データ構造
 
 ## 学習ポイント
 
-- 同一行で 2 入力の横幅バランスを揃える場合、両方を `flex: 1 1 0` にすることで、固定幅指定より自然に 1:1 に寄せやすい。
-- `min-width: 0` がすでに適用されている構成では、狭い幅でも入力欄がはみ出しにくく、スマホ表示で安定しやすい。
+- 保存前共通バリデーションを1か所（`validateRecipeFormValues`）に集約している構成では、`new` / `edit` の要件追加を最小差分で適用できる。
+- バリデーションの実行順を明示して維持すると、ユーザー向けのエラーメッセージ体験を安定させやすい。
 
 ## 確認内容
 
 - `npm run build` が成功することを確認した。
-- IngredientFormModal の保存処理・バリデーション・NumberInputModal 連携に差分がないことを確認した。
-- RecipeForm / calculator画面 / NumberInputModal / LocalStorage 関連ロジックに変更がないことを確認した（今回の差分ファイル外）。
+- 材料0件で保存した場合、アラート表示後に保存されないことをコード上で確認した。
+- 材料1件以上で保存した場合、`new` / `edit` の既存保存フローに進むことをコード上で確認した。
+- 変更対象外のモーダル・LocalStorage・calculator画面・データ構造に差分がないことを確認した。
 
 ## 次にやること
 
-- 実機の狭幅（320px 前後）で、長い単位文字列入力時の表示崩れ有無を目視確認する。
-- 必要に応じて、単位欄の placeholder 表現（例: `g`, `ml`）の UX を検討する。
+- 手動操作で、`new` / `edit` それぞれの材料0件保存時アラート表示タイミングを画面確認する。
+- 必要に応じて、材料セクション直下へのインラインエラー表示（alert以外）のUX改善を検討する。
 
 ## 現在の実装概要
 
-- React + TypeScript + Vite 構成の単一ページアプリ。
-- 画面モード切替で `calculator` / `new` / `edit` を運用。
-- データ永続化は LocalStorage を利用。
+- React + TypeScript + Vite の単一ページアプリ。
+- 画面モード切替（`calculator` / `new` / `edit`）で操作する構成。
+- レシピ保存時は共通バリデーション関数を通し、成功時のみ永続化・画面遷移を行う。
+- 永続化は LocalStorage を利用。
 - 数値入力は `NumberInputModal` を共通利用。
-
-## 現在のデータ構造
-
-- `Recipe`
-  - `id: number`
-  - `name: string`
-  - `description: string`
-  - `baseAmount: number`
-  - `ingredients: Ingredient[]`
-- `Ingredient`
-  - `id: number`
-  - `name: string`
-  - `amount: number`
-  - `unit: string`
 
 ## 現在の画面構成
 
@@ -72,20 +69,23 @@
   - 説明文
 - `calculator` 画面
   - レシピ選択
-  - 新規作成/編集ボタン
-  - 基準分量と今回の分量入力
-  - 材料一覧（換算結果）
-  - 説明表示
-- `new` / `edit` 画面（`RecipeForm`）
-  - レシピ名入力
-  - 説明入力
-  - 基準分量入力（`NumberInputModal` 起点）
-  - 材料追加導線
-  - 材料一覧（編集/削除）
-  - 保存/キャンセル（編集時は削除）
+  - レシピ新規作成/編集ボタン
+  - 基準分量表示と今回の分量入力
+  - 材料一覧（換算表示）
+  - レシピ説明表示
+- `new` 画面（`RecipeForm`）
+  - レシピ名
+  - 説明
+  - 基準分量（`NumberInputModal`）
+  - 材料追加・編集・削除
+  - 保存/キャンセル
+- `edit` 画面（`RecipeForm`）
+  - レシピ名
+  - 説明
+  - 基準分量（`NumberInputModal`）
+  - 材料追加・編集・削除
+  - 保存/キャンセル/削除
 - `IngredientFormModal`
-  - 1行目: `材料名: [材料名]`
-  - 2行目: `分量: [分量] [単位]`（2欄はほぼ 1:1 幅）
-  - 3行目: 保存 / キャンセル（2ボタン等幅で横いっぱい、gap維持）
+  - 材料名・分量・単位の入力
 - `NumberInputModal`
   - 数値入力専用モーダル
