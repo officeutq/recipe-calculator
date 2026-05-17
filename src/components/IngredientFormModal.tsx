@@ -75,17 +75,20 @@ function IngredientFormModal({ open, title, initialIngredient, onClose, onSave }
           <h2>{title}</h2>
 
           <div className="form-grid ingredient-form-modal-grid">
-            <label className="field">
+            <label className="field field--inline ingredient-form-inline-field ingredient-form-inline-field--single">
+              <span className="inline-label">材料名:</span>
               <input
                 type="text"
-                placeholder="材料名"
+                placeholder="カレー"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
               />
             </label>
 
-            <label className="field">
+            <label className="field field--inline ingredient-form-inline-field ingredient-form-inline-field--single">
+              <span className="inline-label">分量:</span>
               <input
+                className="ingredient-form-amount-input"
                 type="text"
                 inputMode="none"
                 placeholder="分量"
@@ -93,10 +96,8 @@ function IngredientFormModal({ open, title, initialIngredient, onClose, onSave }
                 readOnly
                 onClick={() => setIsAmountModalOpen(true)}
               />
-            </label>
-
-            <label className="field">
               <input
+                className="ingredient-form-unit-input"
                 type="text"
                 placeholder="単位"
                 value={unit}
