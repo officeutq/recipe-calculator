@@ -4,6 +4,10 @@ import IngredientList from "./components/IngredientList"
 import { useLocalStorageState } from "./hooks/useLocalStorageState"
 import type { Ingredient, NewIngredient } from "./types/ingredient"
 
+const initialRecipeName = ""
+const initialBaseServings = "4"
+const initialTargetServings = "2"
+
 const initialIngredients: Ingredient[] = [
   { id: 1, name: "じゃがいも", amount: 3, unit: "個" },
   { id: 2, name: "にんじん", amount: 1, unit: "本" },
@@ -21,15 +25,15 @@ const storageKeys = {
 function App() {
   const [recipeName, setRecipeName] = useLocalStorageState(
     storageKeys.recipeName,
-    "",
+    initialRecipeName,
   )
   const [baseServings, setBaseServings] = useLocalStorageState(
     storageKeys.baseServings,
-    "4",
+    initialBaseServings,
   )
   const [targetServings, setTargetServings] = useLocalStorageState(
     storageKeys.targetServings,
-    "2",
+    initialTargetServings,
   )
   const [ingredients, setIngredients] = useLocalStorageState<Ingredient[]>(
     storageKeys.ingredients,
@@ -54,6 +58,13 @@ function App() {
     setIngredients(ingredients.filter((ingredient) => ingredient.id !== id))
   }
 
+  const handleResetRecipe = () => {
+    setRecipeName(initialRecipeName)
+    setBaseServings(initialBaseServings)
+    setTargetServings(initialTargetServings)
+    setIngredients(initialIngredients)
+  }
+
   return (
     <main className="app">
       <section className="app-header">
@@ -65,7 +76,16 @@ function App() {
       </section>
 
       <section className="recipe-card" aria-labelledby="recipe-form-title">
-        <h2 id="recipe-form-title">レシピ情報</h2>
+        <div className="recipe-card-header">
+          <h2 id="recipe-form-title">レシピ情報</h2>
+          <button
+            type="button"
+            className="reset-button"
+            onClick={handleResetRecipe}
+          >
+            リセット
+          </button>
+        </div>
 
         <div className="form-grid">
           <label className="field">
