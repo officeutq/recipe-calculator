@@ -1,8 +1,7 @@
 # 実装記録
 
 作成日: 2026-05-17
-更新日: 2026-05-17
-
+更新日: 2026-05-18
 ## 更新履歴（2026-05-17）
 
 - `IngredientFormModal` / `NumberInputModal` / `RecipeForm` の lint エラー解消を実施した。
@@ -97,3 +96,70 @@
   - 材料名・分量・単位の入力
 - `NumberInputModal`
   - 数値入力専用モーダル
+
+## 2026-05-18: CapacitorによるiOSアプリ化の土台追加
+
+### 実装概要
+
+React + TypeScript + Viteで作成しているレシピ計算機アプリに、Capacitorを導入し、iOSアプリとして起動できる土台を追加した。
+
+今回の対応では、既存のReactアプリ本体は大きく変更せず、Viteのビルド成果物をCapacitor経由でiOSアプリ内に取り込む構成とした。
+
+### 追加・変更内容
+
+- `@capacitor/core` を追加
+- `@capacitor/cli` を追加
+- `@capacitor/ios` を追加
+- `capacitor.config.ts` を追加
+- iOS用のネイティブプロジェクトとして `ios/` を追加
+- `npm run build` 後に `npx cap sync ios` でiOS側へ同期できることを確認
+- XcodeからiOSシミュレータを起動し、レシピ計算機が表示されることを確認
+
+### Capacitor構成
+
+現在の構成は以下の通り。
+
+```txt
+React / TypeScript / Vite
+↓ npm run build
+dist/
+↓ npx cap sync ios
+ios/
+↓ Xcode
+iOSシミュレータ
+```
+
+Capacitorは、既存のReactアプリをiOSアプリのWebView内で動作させるための土台として使用している。
+
+### iOS確認結果
+
+XcodeでiOSシミュレータを起動し、レシピ計算機の画面が表示されることを確認した。
+
+確認できた内容:
+
+* レシピ編集画面が表示される
+* 日本語表示に問題がない
+* 材料一覧が表示される
+* 既存のReact画面がiOSアプリ内で動作する
+* LocalStorageを利用した既存の保存方針は維持
+
+### 今後の検討事項
+
+* iPhoneのSafe Area対応
+
+  * ノッチやホームインジケータ領域を考慮した余白調整
+* アプリアイコン設定
+* スプラッシュ画面設定
+* 実機確認
+* Android対応
+* App Store配布に向けたBundle ID / Signing設定確認
+
+### 動作確認
+
+```bash
+npm run lint
+npm run build
+npx cap sync ios
+```
+
+加えて、XcodeからiOSシミュレータで起動確認済み。
