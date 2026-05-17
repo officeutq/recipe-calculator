@@ -107,8 +107,17 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel, onDelete }: Recipe
           />
         </label>
 
-        <label className="field">
-          <input type="text" inputMode="none" placeholder="基準量" value={baseAmount} readOnly onClick={() => setIsBaseAmountModalOpen(true)} />
+        <label className="field field--inline">
+          <span className="inline-label">基準分量:</span>
+          <input
+            className="base-amount-input"
+            type="text"
+            inputMode="none"
+            placeholder="基準量"
+            value={baseAmount}
+            readOnly
+            onClick={() => setIsBaseAmountModalOpen(true)}
+          />
         </label>
       </div>
 
@@ -128,8 +137,22 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel, onDelete }: Recipe
                 {ingredient.unit}
               </span>
               <div className="ingredient-actions">
-                <button type="button" onClick={() => handleOpenEditIngredientModal(ingredient.id)}>編集</button>
-                <button type="button" onClick={() => handleRemoveIngredient(ingredient.id)}>削除</button>
+                <button
+                  type="button"
+                  className="ingredient-icon-button"
+                  aria-label="材料を編集"
+                  onClick={() => handleOpenEditIngredientModal(ingredient.id)}
+                >
+                  ✏️
+                </button>
+                <button
+                  type="button"
+                  className="ingredient-icon-button"
+                  aria-label="材料を削除"
+                  onClick={() => handleRemoveIngredient(ingredient.id)}
+                >
+                  🗑️
+                </button>
               </div>
             </li>
           ))}
