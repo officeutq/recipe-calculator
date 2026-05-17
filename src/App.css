@@ -59,7 +59,8 @@
 }
 
 .field input,
-.field select {
+.field select,
+.field textarea {
   width: 100%;
   box-sizing: border-box;
   padding: 12px 14px;
@@ -69,9 +70,15 @@
 }
 
 .field input:focus,
-.field select:focus {
+.field select:focus,
+.field textarea:focus {
   border-color: #4f46e5;
   outline: 3px solid rgba(79, 70, 229, 0.16);
+}
+
+.field textarea {
+  resize: vertical;
+  min-height: 112px;
 }
 
 .ingredients-section {
@@ -92,9 +99,29 @@
   margin: 0;
 }
 
+.ingredient-add-button {
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 
 
 .recipe-card--calculator {
+  max-width: none;
+  margin: 0;
+  padding: 0 4px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.recipe-card--form {
   max-width: none;
   margin: 0;
   padding: 0 4px;
