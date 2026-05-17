@@ -8,7 +8,7 @@ type Ingredient = {
   unit: string
 }
 
-const ingredients: Ingredient[] = [
+const initialIngredients: Ingredient[] = [
   { id: 1, name: "じゃがいも", amount: 3, unit: "個" },
   { id: 2, name: "にんじん", amount: 1, unit: "本" },
   { id: 3, name: "玉ねぎ", amount: 2, unit: "個" },
@@ -19,6 +19,7 @@ function App() {
   const [recipeName, setRecipeName] = useState("")
   const [baseServings, setBaseServings] = useState("4")
   const [targetServings, setTargetServings] = useState("2")
+  const [ingredients] = useState<Ingredient[]>(initialIngredients)
 
   const baseServingsNumber = Number(baseServings)
   const targetServingsNumber = Number(targetServings)
