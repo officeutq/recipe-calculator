@@ -4,15 +4,24 @@
 
 ## 現在の実装概要（事実）
 
-- React + TypeScript + Vite の単一画面アプリとして、`calculator` / `new` / `edit` の画面モードで表示を切り替える。
-- `RecipeForm` は新規・編集で再利用し、レシピ基本情報に加えて材料の追加・削除をフォーム内で完結できる。
-- `RecipeForm` の保存時は `name` / `description` / `baseAmount` / `ingredients` をまとめて親へ返し、new/edit ともに同じ値構造で保存する。
-- `calculator` 画面の `IngredientList` は換算表示専用のまま維持し、編集操作は持たせていない。
-- `recipes` / `selectedRecipeId` / `targetServings` / `screenMode` を LocalStorage 同期し、再読み込みで復元する。
+- React + TypeScript + Vite の単一画面アプリとして、`calculator` / `new` / `edit` を画面モードで切り替える。
+- 数値入力モーダル `NumberInputModal` を新規追加し、0〜9・`.`・1文字削除・クリア・キャンセル・決定のみを提供する（計算機能なし）。
+- `RecipeForm` の基準量入力は通常キーボード入力を禁止し、押下で `NumberInputModal` を開いて確定値を反映する。
+- `RecipeForm` は新規・編集で再利用し、レシピ情報と材料追加/削除を同一フォームで扱う。
+- `calculator` 画面の換算表示は `IngredientList` が担当し、編集操作は持たない。
+- `recipes` / `selectedRecipeId` / `targetServings` / `screenMode` を LocalStorage 同期し、再読み込み後に復元する。
 
 ## 現在のデータ構造（事実）
 
 ```ts
+type NumberInputModalProps = {
+  open: boolean
+  value: string
+  allowDecimal?: boolean
+  onClose: () => void
+  onConfirm: (value: string) => void
+}
+
 type Ingredient = {
   id: number
   name: string
@@ -38,17 +47,6 @@ type RecipeFormValues = {
 }
 ```
 
-主要 state:
-
-- `recipes: Recipe[]`
-- `selectedRecipeId: number | null`
-- `targetServings: string`
-- `screenMode: ScreenMode`
-- `RecipeForm` 内部 state
-  - レシピ入力: `name` / `description` / `baseAmount`
-  - 材料一覧: `ingredients`
-  - 材料入力欄: `ingredientName` / `ingredientAmount` / `ingredientUnit`
-
 ## 現在の画面構成（事実）
 
 - ヘッダー
@@ -56,60 +54,56 @@ type RecipeFormValues = {
 - calculator 画面
   - レシピ情報カード
     - リセット
-    - レシピ新規作成（`screenMode = "new"`）
-    - レシピ編集（選択時のみ、`screenMode = "edit"`）
-    - レシピ選択ドロップダウン
+    - レシピ新規作成
+    - レシピ編集
+    - レシピ選択
     - 説明表示
     - 基準量表示
     - 作成量入力
-  - 材料セクション（`IngredientList` による換算表示専用）
-- new 画面
-  - `RecipeForm`
-    - レシピ名 / 説明 / 基準量
-    - 材料追加欄（材料名 / 分量 / 単位 / 追加）
-    - 追加済み材料一覧（各行に削除）
-    - 保存（新規レシピ追加 + 選択 + calculator に戻る）
-    - キャンセル（変更なしで calculator に戻る）
-- edit 画面
-  - `RecipeForm`
-    - 選択中レシピの初期値表示（基本情報 + 材料一覧）
-    - 材料追加・削除
-    - 保存（対象 id のレシピ更新 + calculator に戻る）
-    - キャンセル（変更なしで calculator に戻る）
+  - 材料換算セクション（表示専用）
+- new 画面 / edit 画面（`RecipeForm` 共通）
+  - レシピ名入力
+  - 説明入力
+  - 基準量入力（readonly、押下で数値入力モーダル表示）
+  - 材料追加欄（材料名 / 分量 / 単位 / 追加）
+  - 材料一覧（削除）
+  - 保存 / キャンセル
+- 数値入力モーダル（`NumberInputModal`）
+  - 表示値
+  - キーパッド（7-9, 4-6, 1-3, 0, ., ←）
+  - クリア / キャンセル / 決定
 
 ## 更新履歴（2026-05-17）
 
 ### 変更ファイル（事実）
 
+- `src/components/NumberInputModal.tsx`
 - `src/components/RecipeForm.tsx`
-- `src/App.tsx`
 - `src/App.css`
 - `docs/implementation-log.md`
 
 ### 実装内容（事実）
 
-- `RecipeFormValues` を拡張し、`ingredients: Ingredient[]` を追加した。
-- `RecipeForm` 内で `ingredients` を state 管理するようにし、初期値を `new` は空配列、`edit` は `initialRecipe.ingredients` とした。
-- `initialRecipe` 変更時に `useEffect` で `ingredients` を含むフォーム状態を同期するようにした。
-- `RecipeForm` に材料編集セクションを追加し、材料名・分量・単位入力と追加ボタンを実装した。
-- 材料追加時バリデーションを追加した（材料名空不可、分量は 0 より大きい、単位空不可）。失敗時は `alert()` を表示する。
-- 材料追加時に `{ id: Date.now(), name, amount, unit }` 形式で `ingredients` に追加し、追加後に入力欄をクリアするようにした。
-- 追加済み材料一覧に削除ボタンを実装し、押下時に対象材料を即時削除（confirm なし）するようにした。
-- `App` 側の new/edit 保存処理で、`ingredients` を含めてレシピ保存するように変更した。
-- calculator 画面の `IngredientList` は変更せず、既存の換算表示を維持した。
+- `NumberInputModal` を新規実装し、独自数値入力 UI を追加した。
+- `allowDecimal` が `false` の場合は `.` 入力を禁止し、ボタンも非活性化するようにした。
+- `allowDecimal` が `true` の場合は `.` を1回だけ入力可能にした。
+- `←` で末尾1文字削除、`クリア` で空文字化、`キャンセル` で閉じる、`決定` で確定値を返す動作を実装した。
+- `RecipeForm` の基準量入力を `readOnly` + `inputMode="none"` に変更し、押下でモーダルを開く仕様に置換した。
+- `RecipeForm` では基準量のみ今回置換し、作成量や材料分量入力には手を入れていない。
+- モーダル関連スタイルを `App.css` に追加した。
 
 ### 学習ポイント（事実）
 
-- 親子でフォーム値をやり取りする場合、フォーム値型を子コンポーネントから export して共通利用すると整合性が保ちやすい。
-- `edit` での再利用フォームは、`props` の初期値注入だけでは不十分で、対象切り替え時の state 同期が必要になる。
-- 「編集UI」と「表示専用UI」を分離しておくと、計算ロジックを壊さずに編集機能を追加しやすい。
+- 数値入力モーダル側に一時入力 state を持たせると、`キャンセル` 時に親 state を汚さずに確定操作のみ反映できる。
+- `allowDecimal` の仕様は「ボタン無効化」と「ロジック側拒否」の二重防御にすると安全性が高い。
+- 再利用コンポーネント化する際は、画面固有ロジック（開閉 state 管理）を呼び出し側に寄せると用途拡張しやすい。
 
 ### 確認内容（事実）
 
-- `npm run build` が成功し、型チェックとビルドが通ることを確認した。
-- new/edit で追加した材料が保存後に calculator 画面の換算表示に反映されることを確認した。
+- `npm run build` が成功し、型チェックと本番ビルドが通ることを確認した。
+- 基準量入力欄押下でモーダル表示、決定でフォーム反映、キャンセルで非反映となることを確認した。
 
 ### 次にやること（推測）
 
-- 材料の並び替えや編集（更新）機能が必要になった場合の UI 方針を決める。
-- 数値入力 UX 改善のため、要件に応じて `NumberInputModal` との統合を将来検討する。
+- 同じ `NumberInputModal` を作成量・材料分量へ段階展開する優先順位を決める。
+- モーダルのフォーカス制御やキーボード操作対応（必要なら）を検討する。

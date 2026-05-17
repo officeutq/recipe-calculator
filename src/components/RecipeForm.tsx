@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import NumberInputModal from "./NumberInputModal"
 import type { Ingredient, Recipe } from "../types/ingredient"
 
 export type RecipeFormValues = {
@@ -27,6 +28,7 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel }: RecipeFormProps)
   const [ingredientName, setIngredientName] = useState("")
   const [ingredientAmount, setIngredientAmount] = useState("")
   const [ingredientUnit, setIngredientUnit] = useState("")
+  const [isBaseAmountModalOpen, setIsBaseAmountModalOpen] = useState(false)
 
   useEffect(() => {
     setName(initialRecipe?.name ?? "")
@@ -95,11 +97,12 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel }: RecipeFormProps)
 
         <label className="field">
           <input
-            type="number"
-            min="1"
+            type="text"
+            inputMode="none"
             placeholder="基準量"
             value={baseAmount}
-            onChange={(event) => setBaseAmount(event.target.value)}
+            readOnly
+            onClick={() => setIsBaseAmountModalOpen(true)}
           />
         </label>
       </div>
@@ -155,6 +158,18 @@ function RecipeForm({ title, initialRecipe, onSave, onCancel }: RecipeFormProps)
           ))}
         </ul>
       </div>
+
+
+      <NumberInputModal
+        open={isBaseAmountModalOpen}
+        value={baseAmount}
+        allowDecimal={false}
+        onClose={() => setIsBaseAmountModalOpen(false)}
+        onConfirm={(value) => {
+          setBaseAmount(value)
+          setIsBaseAmountModalOpen(false)
+        }}
+      />
 
       <div className="recipe-action-buttons form-actions">
         <button

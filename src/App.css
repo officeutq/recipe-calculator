@@ -188,3 +188,60 @@
   font-weight: 700;
   cursor: pointer;
 }
+
+.number-input-modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.number-input-modal {
+  width: min(360px, 100%);
+  padding: 20px;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.25);
+}
+
+.number-input-display {
+  margin: 0 0 16px;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  text-align: right;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.number-input-key-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.number-input-key-grid button,
+.number-input-actions button {
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.number-input-key-grid button:disabled {
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.number-input-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
