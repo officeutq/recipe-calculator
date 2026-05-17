@@ -73,18 +73,21 @@ npm run dev
 npm run build
 ```
 
-## Implementation Log
+## Implementation Log Rules
 
-実装を行った場合は、必ず `docs/implementation-log.md` を更新する。
+実装を行った場合は必ず
+docs/implementation-log.md
+を更新する。
 
-更新内容には以下を含める。
+追記内容:
 
-- 作業日
-- 作業概要
+- 更新履歴
 - 変更ファイル
 - 実装内容
 - 学習ポイント
-- 確認したこと
+- 確認内容
 - 次にやること
 
 日本語で記録する。
+
+事実と推測は分離する。
