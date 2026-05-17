@@ -6,10 +6,24 @@
 ## 現在の実装概要（事実）
 
 - React + TypeScript + Vite の単一画面アプリとして、`calculator` / `new` / `edit` を画面モードで切り替える。
-- `IngredientList` は換算結果の表示専用コンポーネントで、編集操作は持たない。
-- 換算表示の数値整形は `formatAmount(value: number)` で共通化し、**小数第2位まで表示 + 末尾0削除**を適用している。
-- 数値入力は `NumberInputModal` を再利用し、基準量・作成量・材料分量の入力で統一している。
 - `recipes` / `selectedRecipeId` / `targetServings` / `screenMode` を LocalStorage 同期し、再読み込み後に復元する。
+- `calculator` 画面ではレシピの換算表示のみを行い、レシピ全体のリセット機能は持たない。
+- レシピ削除は `edit` 画面の `RecipeForm` から実行し、確認ダイアログ後に対象レシピのみ削除する。
+- 削除後は `calculator` に戻り、残件があれば先頭レシピを選択、0件なら `selectedRecipeId` を `null` にする。
+
+## 現在のデータ構造（事実）
+
+- `Recipe`
+  - `id: number`
+  - `name: string`
+  - `description: string`
+  - `baseAmount: number`
+  - `ingredients: Ingredient[]`
+- `Ingredient`
+  - `id: number`
+  - `name: string`
+  - `amount: number`
+  - `unit: string`
 
 ## 現在の画面構成（事実）
 
@@ -17,7 +31,6 @@
   - アプリ名、説明文
 - `calculator` 画面
   - レシピ情報カード
-    - リセット
     - レシピ新規作成
     - レシピ編集
     - レシピ選択
@@ -25,51 +38,46 @@
     - 基準量表示
     - 作成量入力（readonly、押下で数値入力モーダル表示）
   - 材料換算セクション（表示専用）
-    - 元分量
-    - 換算分量（`formatAmount` 適用）
 - `new` / `edit` 画面（`RecipeForm` 共通）
   - レシピ名入力
   - 説明入力
   - 基準量入力（readonly、押下で数値入力モーダル表示）
   - 材料追加欄（材料名 / 分量[readonly + モーダル] / 単位 / 追加）
   - 材料一覧（削除）
-  - 保存 / キャンセル
+  - 操作ボタン
+    - `new`: 保存 / キャンセル
+    - `edit`: 保存 / キャンセル / 削除
 - 数値入力モーダル（`NumberInputModal`）
-  - 表示値
-  - キーパッド（7-9, 4-6, 1-3, 0, ., ←）
-  - クリア / キャンセル / 決定
 
 ## 更新履歴（2026-05-17）
 
 ### 変更ファイル（事実）
 
-- `src/utils/formatAmount.ts`
-- `src/components/IngredientList.tsx`
+- `src/App.tsx`
+- `src/components/RecipeForm.tsx`
+- `src/App.css`
 - `docs/implementation-log.md`
 
 ### 実装内容（事実）
 
-- `src/utils/formatAmount.ts` を追加し、`formatAmount(value: number)` を実装した。
-  - `Math.round(value * 100) / 100` で小数第2位に丸める。
-  - `toFixed(2)` 後に正規表現で末尾0を削除する。
-  - 例: `100.00 -> 100`, `100.50 -> 100.5`, `100.333 -> 100.33`。
-- `IngredientList` の換算表示で `formatAmount` を利用するように変更した。
-- 表示のみの変更であり、`ingredient.amount` など元データの保持値は変更していない。
+- `calculator` 画面からリセットボタンを削除し、関連イベント（全レシピ初期化処理）を削除した。
+- `RecipeForm` に `onDelete` を任意 props として追加し、指定時のみ削除ボタンを表示するようにした。
+- `edit` 画面で `onDelete` を渡し、`new` 画面では渡さないことで、削除ボタン表示条件を満たした。
+- 削除時に `window.confirm("このレシピを削除しますか？")` を実行し、OK の場合のみ対象レシピを削除するようにした。
+- 削除後は `screenMode` を `calculator` に戻し、`selectedRecipeId` を残件先頭 or `null` に更新するようにした。
 
 ### 学習ポイント（事実）
 
-- 数値整形を表示レイヤーの共通関数に分離すると、計算ロジックや保存データを変更せずに UX 改善できる。
-- `toFixed(2)` と末尾0削除を組み合わせると、表示ルールをシンプルに満たせる。
+- フォーム再利用時は「任意 props + 条件描画」にすると、`new` と `edit` の差分要件を局所化できる。
+- 削除後の選択状態遷移を明示すると、UI と LocalStorage の整合を維持しやすい。
 
 ### 確認内容（事実）
 
-- `npm run build` が成功し、型チェックと本番ビルドが通ることを確認した。
-- `IngredientList` の換算表示が次のルールになることを確認した。
-  - 整数は整数表示（例: `100`）
-  - 小数1桁はそのまま表示（例: `100.5`）
-  - 長い小数は小数第2位まで表示（例: `100.3333333 -> 100.33`）
+- `npm run build` が成功し、TypeScript ビルドおよび Vite ビルドが通ることを確認した。
+- `new` 画面では削除ボタンが表示されず、`edit` 画面でのみ表示されることを確認した（コード上）。
+- 削除確定時の遷移・選択更新ルールが実装されていることを確認した（コード上）。
 
 ### 次にやること（推測）
 
-- 必要に応じて `formatAmount` の単体テストを追加し、境界値（負数・非常に小さい値）も確認する。
-- 将来要件（単位別丸め・分数化など）が発生した場合は、`formatAmount` を拡張せず別責務で切り出す方針を検討する。
+- プレースホルダ運用の見直し（別 Issue）に着手する。
+- 必要に応じて削除フローの E2E テストを追加し、誤操作防止仕様を自動確認できるようにする。

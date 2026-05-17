@@ -123,10 +123,20 @@ function App() {
     setScreenMode("calculator")
   }
 
-  const handleResetRecipe = () => {
-    setRecipes(initialRecipes)
-    setSelectedRecipeId(null)
-    setTargetServings(initialTargetServings)
+  const handleDeleteRecipe = () => {
+    if (!selectedRecipe) {
+      return
+    }
+
+    const shouldDelete = window.confirm("このレシピを削除しますか？")
+    if (!shouldDelete) {
+      return
+    }
+
+    const nextRecipes = recipes.filter((recipe) => recipe.id !== selectedRecipe.id)
+    setRecipes(nextRecipes)
+    setSelectedRecipeId(nextRecipes.length > 0 ? nextRecipes[0].id : null)
+    setScreenMode("calculator")
   }
 
   return (
@@ -143,13 +153,6 @@ function App() {
         <section className="recipe-card" aria-labelledby="recipe-form-title">
           <div className="recipe-card-header">
             <h2 id="recipe-form-title">レシピ情報</h2>
-            <button
-              type="button"
-              className="reset-button"
-              onClick={handleResetRecipe}
-            >
-              リセット
-            </button>
           </div>
 
           <div className="recipe-action-buttons">
@@ -228,6 +231,7 @@ function App() {
           initialRecipe={selectedRecipe}
           onSave={handleSaveEditedRecipe}
           onCancel={() => setScreenMode("calculator")}
+          onDelete={handleDeleteRecipe}
         />
       )}
     </main>
