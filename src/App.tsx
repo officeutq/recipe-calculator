@@ -167,6 +167,7 @@ function App() {
   return (
     <main className="app">
       <section className="app-header">
+        <img className="app-icon" src="/app-icon.png" alt="レシピ計算機のアイコン" />
         <p className="app-label">Recipe Calculator</p>
         <h1>レシピ計算機</h1>
         <p className="app-description">

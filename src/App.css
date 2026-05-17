@@ -16,6 +16,13 @@
   text-align: center;
 }
 
+.app-icon {
+  display: block;
+  width: clamp(72px, 18vw, 96px);
+  height: auto;
+  margin: 0 auto 12px;
+}
+
 .app-label {
   margin: 0 0 8px;
   color: #4f46e5;
