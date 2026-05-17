@@ -97,16 +97,29 @@
   padding-top: 12px;
 }
 
-.recipe-form-inline-field textarea {
-  flex: 1 1 280px;
+.recipe-form-inline-field--single {
+  flex-wrap: nowrap;
 }
 
-.recipe-form-inline-field input:not(.base-amount-input) {
+.recipe-form-inline-field--single .inline-label {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  padding-top: 0;
+}
+
+.recipe-form-inline-field textarea {
   flex: 1 1 280px;
+  min-width: 0;
+}
+
+.recipe-form-inline-field input:not(.base-amount-input),
+.recipe-form-inline-field .base-amount-input {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .base-amount-input {
-  width: 112px;
+  width: auto;
 }
 
 .ingredient-icon-button {
