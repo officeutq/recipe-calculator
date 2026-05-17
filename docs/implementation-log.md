@@ -7,6 +7,7 @@
 
 - IngredientFormModal の材料名プレースホルダーを「カレー」から「材料名」へ変更した。
 - IngredientFormModal の分量欄と単位欄の横幅バランスを、スマホ幅でも自然な 1:1 付近になるよう調整した。
+- IngredientFormModal の保存 / キャンセルボタンを 1:1 の等幅で横いっぱいに広がるよう調整した。
 
 ## 変更ファイル
 
@@ -20,6 +21,8 @@
 - 分量入力欄（`ingredient-form-amount-input`）の `flex` を `1 1 0` に変更した。
 - 単位入力欄（`ingredient-form-unit-input`）の `flex` を `1 1 0` に変更した。
 - 既存の `gap`（`ingredient-form-inline-field--single` の `gap: 10px`）は維持した。
+- モーダル下部のアクションボタン（保存 / キャンセル）に `flex: 1 1 0` を追加し、2 ボタンを等幅で親幅いっぱいに配置した。
+- アクション行の `gap: 8px` とボタン `padding: 10px 12px` は維持し、タップしやすさを維持した。
 - 分量入力は既存どおり readOnly + クリックで `NumberInputModal` を開く仕様を維持した。
 - 単位入力の state（`unit`）および保存処理（`onSave` 時の `trim` と保存値）は変更していない。
 - IngredientFormModal の保存処理・バリデーション・モーダル構造は変更していない。
@@ -33,7 +36,7 @@
 
 - `npm run build` が成功することを確認した。
 - IngredientFormModal の保存処理・バリデーション・NumberInputModal 連携に差分がないことを確認した。
-- RecipeForm / calculator画面 / LocalStorage 関連ロジックに変更がないことを確認した（今回の差分ファイル外）。
+- RecipeForm / calculator画面 / NumberInputModal / LocalStorage 関連ロジックに変更がないことを確認した（今回の差分ファイル外）。
 
 ## 次にやること
 
@@ -83,6 +86,6 @@
 - `IngredientFormModal`
   - 1行目: `材料名: [材料名]`
   - 2行目: `分量: [分量] [単位]`（2欄はほぼ 1:1 幅）
-  - 保存 / キャンセル
+  - 3行目: 保存 / キャンセル（2ボタン等幅で横いっぱい、gap維持）
 - `NumberInputModal`
   - 数値入力専用モーダル
