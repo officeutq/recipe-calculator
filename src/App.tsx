@@ -2,19 +2,7 @@ import { useEffect, useState } from "react"
 import "./App.css"
 import IngredientForm from "./components/IngredientForm"
 import IngredientList from "./components/IngredientList"
-
-type Ingredient = {
-  id: number
-  name: string
-  amount: number
-  unit: string
-}
-
-type NewIngredient = {
-  name: string
-  amount: number
-  unit: string
-}
+import type { Ingredient, NewIngredient } from "./types/ingredient"
 
 const initialIngredients: Ingredient[] = [
   { id: 1, name: "じゃがいも", amount: 3, unit: "個" },

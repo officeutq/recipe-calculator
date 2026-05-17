@@ -1,11 +1,8 @@
 import { useState } from "react"
+import type { NewIngredient } from "../types/ingredient"
 
 type IngredientFormProps = {
-  onAddIngredient: (ingredient: {
-    name: string
-    amount: number
-    unit: string
-  }) => void
+  onAddIngredient: (newIngredient: NewIngredient) => void
 }
 
 function IngredientForm({ onAddIngredient }: IngredientFormProps) {

@@ -1,9 +1,4 @@
-type Ingredient = {
-  id: number
-  name: string
-  amount: number
-  unit: string
-}
+import type { Ingredient } from "../types/ingredient"
 
 type IngredientListProps = {
   ingredients: Ingredient[]
